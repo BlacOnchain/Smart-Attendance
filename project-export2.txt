@@ -1,0 +1,1955 @@
+
+
+=== FILE: routes\web.php ===
+<?php
+
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CourseAssignmentController;
+use App\Http\Controllers\StudentController;
+use App\Models\LoginActivity;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('auth.login');
+});
+
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+Route::get('/lecturer/login', function () {
+    return view('auth.lecturer-login');
+})->name('lecturer.login');
+
+Route::post('/login', function (Request $request) {
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+        $ip = $request->ip();
+
+        $isNewIp = !LoginActivity::where('user_id', $user->id)
+            ->where('ip_address', $ip)
+            ->exists();
+
+        LoginActivity::create([
+            'user_id' => $user->id,
+            'ip_address' => $ip,
+            'user_agent' => $request->userAgent(),
+            'logged_in_at' => now(),
+        ]);
+
+        $target = $user && $user->role === 'lecturer'
+            ? route('lecturer.dashboard')
+            : route('student.dashboard');
+
+        return redirect()->intended($target);
+    }
+
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ])->onlyInput('email');
+})->name('login.submit');
+
+Route::post('/lecturer/login', function (Request $request) {
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+
+        if ($user && $user->role === 'lecturer') {
+            $ip = $request->ip();
+
+            $isNewIp = !LoginActivity::where('user_id', $user->id)
+                ->where('ip_address', $ip)
+                ->exists();
+
+            LoginActivity::create([
+                'user_id' => $user->id,
+                'ip_address' => $ip,
+                'user_agent' => $request->userAgent(),
+                'logged_in_at' => now(),
+            ]);
+
+            return redirect()->intended(route('lecturer.dashboard'));
+        }
+
+        Auth::logout();
+
+        return back()->withErrors([
+            'email' => 'This account is not a lecturer account.',
+        ])->onlyInput('email');
+    }
+
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ])->onlyInput('email');
+})->name('lecturer.login.submit');
+
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
+
+// --- OTP Forgot Password Routes ---
+Route::post('/password/otp/send', [AuthController::class, 'sendOtpCode'])->name('password.otp.send');
+Route::post('/password/otp/verify', [AuthController::class, 'verifyOtpCode'])->name('password.otp.verify');
+Route::post('/password/otp/reset', [AuthController::class, 'resetPasswordWithOtp'])->name('password.otp.reset');
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::middleware(['auth', 'role:lecturer'])->group(function () {
+    Route::get('/lecturer/dashboard', [AttendanceController::class, 'lecturerDashboard'])->name('lecturer.dashboard');
+    Route::get('/lecturer/students', [AttendanceController::class, 'studentsView'])->name('lecturer.students');
+    Route::get('/lecturer/courses', [AttendanceController::class, 'coursesView'])->name('lecturer.courses');
+    Route::post('/lecturer/session/start', [AttendanceController::class, 'startSession'])->name('lecturer.session.start');
+    Route::post('/lecturer/session/{id}/rotate', [AttendanceController::class, 'rotateToken'])->name('lecturer.session.rotate');
+    Route::post('/lecturer/session/{id}/close', [AttendanceController::class, 'closeSession'])->name('lecturer.session.close');
+    Route::post('/lecturer/course/{id}/claim', [AttendanceController::class, 'claimCourse'])->name('lecturer.course.claim');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/course-assignments', [CourseAssignmentController::class, 'index'])->name('admin.course-assignments');
+    Route::post('/admin/course-assignments/{course}', [CourseAssignmentController::class, 'update'])->name('admin.course-assignments.update');
+});
+
+Route::middleware(['auth', 'role:student'])->group(function () {
+    Route::get('/student/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
+    Route::get('/student/profile', [StudentController::class, 'profileView'])->name('student.profile');
+    Route::post('/student/profile/update', [StudentController::class, 'updateProfile'])->name('student.profile.update');
+    
+    // Session termination route
+    Route::post('/student/profile/logout-session/{id}', [StudentController::class, 'logoutSession'])->name('student.profile.logout-session');
+
+    // Official Course Registration Form Slip Route
+    Route::get('/student/course-form', [StudentController::class, 'courseForm'])->name('student.course-form');
+
+    Route::get('/student/timetable', [StudentController::class, 'timetableView'])->name('student.timetable');
+    Route::get('/student/camera', [StudentController::class, 'cameraScan'])->name('student.camera');
+    Route::get('/student/scan/{token}', [AttendanceController::class, 'showScanPage'])->name('student.scan');
+    Route::post('/student/log/{token}', [AttendanceController::class, 'logAttendance'])->name('student.log');
+});
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\app\Models\Attendance.php ===
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Attendance extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ['attendance_session_id', 'user_id', 'scanned_at'];
+
+    // Cast scanned_at as a datetime object so ->format() works perfectly
+    protected $casts = [
+        'scanned_at' => 'datetime',
+    ];
+
+    // Relationship to get the student's profile info
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function session()
+    {
+        return $this->belongsTo(AttendanceSession::class, 'attendance_session_id');
+    }
+}
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\app\Models\AttendanceSession.php ===
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class AttendanceSession extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ['course_code', 'session_token', 'is_active', 'lecturer_id', 'token_generated_at'];
+
+    // Without this cast, token_generated_at comes back as a plain string,
+    // and isTokenExpired()'s ->diffInSeconds(now()) call in
+    // AttendanceController would throw a fatal error the first time a
+    // session actually had a value in that column.
+    protected $casts = [
+        'token_generated_at' => 'datetime',
+        'is_active' => 'boolean',
+    ];
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'attendance_session_id');
+    }
+
+    // Needed by lecturer.blade.php ($session->lecturer->name, HOD view).
+    // Without this, ->lecturer always resolves to null and every session
+    // silently shows "Unknown" instead of the lecturer who started it.
+    public function lecturer()
+    {
+        return $this->belongsTo(User::class, 'lecturer_id');
+    }
+}
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\app\Models\course.php ===
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Course extends Model
+{
+    protected $table = 'courses';
+
+    protected $fillable = [
+        'course_code',
+        'course_title',
+        'level',
+        'department',
+        'semester',
+        'units',
+        'lecturer_id',
+    ];
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'course_user');
+    }
+
+    public function lecturer()
+    {
+        return $this->belongsTo(User::class, 'lecturer_id');
+    }
+}
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\app\Models\LoginActivity.php ===
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class LoginActivity extends Model
+{
+    protected $fillable = [
+        'user_id',
+        'ip_address',
+        'user_agent',
+        'logged_in_at',
+    ];
+
+    protected $casts = [
+        'logged_in_at' => 'datetime',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\app\Models\Timetable.php ===
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Timetable extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'course_code',
+        'day_of_week',
+        'start_time',
+        'end_time'
+    ];
+}
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\app\Models\User.php ===
+<?php
+
+namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+        'is_hod',
+        'matric_number',
+        'phone_number',
+        'department',
+        'level',
+        'semester',
+        'profile_photo_path',
+        'otp_code',          // Added for password reset
+        'otp_expires_at',    // Added for password reset
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'is_hod' => 'boolean',
+        'otp_expires_at' => 'datetime',
+    ];
+
+    /**
+     * Relationship: A user has many courses (student enrollments).
+     */
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'course_user');
+    }
+
+    /**
+     * Relationship: A user (lecturer) can have started many attendance sessions.
+     */
+    public function attendanceSessions()
+    {
+        return $this->hasMany(AttendanceSession::class, 'lecturer_id');
+    }
+
+    /**
+     * Full URL to the profile photo, or null if none uploaded.
+     */
+    public function getProfilePhotoUrlAttribute(): ?string
+    {
+        return $this->profile_photo_path
+            ? asset('storage/' . $this->profile_photo_path)
+            : null;
+    }
+}
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\app\Http\Controllers\AttendanceController.php ===
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Attendance;
+use App\Models\AttendanceSession;
+use App\Models\Course;
+use App\Models\Timetable;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+
+class AttendanceController extends Controller
+{
+    private const TOKEN_FRESHNESS_SECONDS = 1800;
+
+    // 1. Show Lecturer Dashboard — Scoped overview & active session tools
+    public function lecturerDashboard()
+    {
+        $user = Auth::user();
+
+        $myCourses = Course::where('lecturer_id', $user->id)->orderBy('course_code')->get();
+        $myCourseCodes = $myCourses->pluck('course_code');
+
+        $sessions = AttendanceSession::whereIn('course_code', $myCourseCodes)
+            ->with('attendances.user')
+            ->withCount('attendances')
+            ->latest()
+            ->get();
+
+        $activeSession = AttendanceSession::where('is_active', true)
+            ->whereIn('course_code', $myCourseCodes)
+            ->latest()
+            ->first();
+
+        $sessionIds = $sessions->pluck('id');
+
+        $totalSessions = $sessions->count();
+        $totalCheckIns = Attendance::whereIn('attendance_session_id', $sessionIds)->count();
+        $todayCheckIns = Attendance::whereIn('attendance_session_id', $sessionIds)
+            ->whereDate('created_at', today())
+            ->count();
+        $activeSessionsCount = $sessions->where('is_active', true)->count();
+
+        $recentAttendances = Attendance::with('user', 'session')
+            ->whereIn('attendance_session_id', $sessionIds)
+            ->latest()
+            ->take(8)
+            ->get();
+
+        return view('lecturer.dashboard', compact(
+            'sessions',
+            'activeSession',
+            'totalSessions',
+            'totalCheckIns',
+            'todayCheckIns',
+            'activeSessionsCount',
+            'recentAttendances',
+            'myCourses'
+        ) + [
+            'tokenFreshnessSeconds' => self::TOKEN_FRESHNESS_SECONDS,
+        ]);
+    }
+
+    // 2. Dedicated Students Attendance Summary Page
+    public function studentsView()
+    {
+        $user = Auth::user();
+        $myCourseCodes = Course::where('lecturer_id', $user->id)->pluck('course_code');
+        $sessionIds = AttendanceSession::whereIn('course_code', $myCourseCodes)->pluck('id');
+
+        $studentAttendanceCounts = Attendance::with('user')
+            ->whereIn('attendance_session_id', $sessionIds)
+            ->get()
+            ->filter(fn ($attendance) => $attendance->user !== null)
+            ->groupBy('user_id')
+            ->map(function ($group) {
+                return (object) [
+                    'user' => $group->first()->user,
+                    'count' => $group->count(),
+                    'last_checked_in' => $group->max('scanned_at'),
+                ];
+            })
+            ->sortByDesc('count')
+            ->values();
+
+        return view('lecturer.students', compact('studentAttendanceCounts'));
+    }
+
+    // 3. Dedicated My Courses & Course Claiming Page
+    public function coursesView()
+    {
+        $user = Auth::user();
+        $myCourses = Course::where('lecturer_id', $user->id)->orderBy('course_code')->get();
+        $unclaimedCourses = Course::whereNull('lecturer_id')->orderBy('course_code')->get();
+
+        return view('lecturer.courses', compact('myCourses', 'unclaimedCourses'));
+    }
+
+    // Initialize a new tracking session
+    public function startSession(Request $request)
+    {
+        $request->validate([
+            'course_code' => 'required|string|max:50|exists:courses,course_code',
+        ]);
+
+        $courseCode = strtoupper(trim($request->course_code));
+        $course = Course::where('course_code', $courseCode)->first();
+
+        if (!$course || $course->lecturer_id !== Auth::id()) {
+            abort(403, 'You can only start sessions for courses assigned to you.');
+        }
+
+        AttendanceSession::create([
+            'course_code' => $courseCode,
+            'session_token' => Str::random(40),
+            'token_generated_at' => now(),
+            'is_active' => true,
+            'lecturer_id' => Auth::id(),
+        ]);
+
+        return redirect()->route('lecturer.dashboard')->with('success', 'Attendance session started!');
+    }
+
+    // Claim an unassigned course
+    public function claimCourse($id)
+    {
+        $course = Course::findOrFail($id);
+
+        if ($course->lecturer_id) {
+            return back()->withErrors(['course' => 'That course is already assigned to a lecturer.']);
+        }
+
+        $course->update(['lecturer_id' => Auth::id()]);
+
+        return redirect()->route('lecturer.courses')->with('success', "You're now assigned to {$course->course_code}.");
+    }
+
+    public function showScanPage($token)
+    {
+        $session = AttendanceSession::where('session_token', $token)
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        $expired = $this->isTokenExpired($session);
+
+        return view('scan_page', [
+            'session' => $session,
+            'token' => $token,
+            'expired' => $expired,
+            'tokenFreshnessSeconds' => self::TOKEN_FRESHNESS_SECONDS,
+        ]);
+    }
+
+    public function logAttendance(Request $request, $token)
+    {
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Please sign in first.'], 401);
+        }
+
+        $session = AttendanceSession::where('session_token', $token)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$session) {
+            return response()->json([
+                'message' => 'This QR code is no longer active. Ask your lecturer for the current code.',
+            ], 404);
+        }
+
+        if ($this->isTokenExpired($session)) {
+            return response()->json([
+                'message' => 'This QR code has expired. Please scan the current code on your lecturer\'s screen.',
+            ], 410);
+        }
+
+        $currentTime = now()->format('H:i:s');
+        $currentDay = now()->format('l');
+
+        $schedule = Timetable::where('course_code', $session->course_code)
+            ->where('day_of_week', $currentDay)
+            ->first();
+
+        if ($schedule) {
+            $startsAt = $schedule->start_time;
+            $endsAt = $schedule->end_time;
+
+            if ($currentTime < $startsAt || $currentTime > $endsAt) {
+                $session->update(['is_active' => false]);
+
+                return response()->json(['message' => 'Lecture period has ended.'], 403);
+            }
+        }
+
+        $userId = Auth::id();
+
+        $alreadyLogged = Attendance::where('attendance_session_id', $session->id)
+            ->where('user_id', $userId)
+            ->exists();
+
+        if ($alreadyLogged) {
+            return response()->json(['message' => 'Already checked in.'], 409);
+        }
+
+        try {
+            Attendance::create([
+                'attendance_session_id' => $session->id,
+                'user_id' => $userId,
+                'scanned_at' => now(),
+            ]);
+        } catch (QueryException $e) {
+            if ($this->isDuplicateKeyError($e)) {
+                return response()->json(['message' => 'Already checked in.'], 409);
+            }
+
+            throw $e;
+        }
+
+        return response()->json(['message' => 'Attendance logged successfully!']);
+    }
+
+    public function rotateToken($id)
+    {
+        $session = AttendanceSession::where('id', $id)->where('is_active', true)->firstOrFail();
+        $this->authorizeSessionOwner($session);
+
+        $session->update([
+            'session_token' => Str::random(40),
+            'token_generated_at' => now(),
+        ]);
+
+        return response()->json([
+            'new_token' => $session->session_token,
+            'new_url' => route('student.scan', $session->session_token),
+            'expires_in' => self::TOKEN_FRESHNESS_SECONDS,
+        ]);
+    }
+
+    public function closeSession($id)
+    {
+        $session = AttendanceSession::where('id', $id)->where('is_active', true)->first();
+
+        if (!$session) {
+            return redirect()->route('lecturer.dashboard')->with('error', 'This session is already closed or does not exist.');
+        }
+
+        $this->authorizeSessionOwner($session);
+        $session->update(['is_active' => false]);
+
+        return redirect()->route('lecturer.dashboard')->with('success', 'Session closed successfully.');
+    }
+
+    private function authorizeSessionOwner(AttendanceSession $session): void
+    {
+        if ($session->lecturer_id !== Auth::id()) {
+            abort(403, 'You can only manage sessions you started.');
+        }
+    }
+
+    private function isTokenExpired(AttendanceSession $session): bool
+    {
+        if (!$session->token_generated_at) {
+            return true;
+        }
+
+        return $session->token_generated_at->diffInSeconds(now()) > self::TOKEN_FRESHNESS_SECONDS;
+    }
+
+    private function isDuplicateKeyError(QueryException $e): bool
+    {
+        $sqlState = $e->errorInfo[0] ?? null;
+        $driverCode = $e->errorInfo[1] ?? null;
+
+        return $driverCode == 1062
+            || $sqlState === '23505'
+            || str_contains($e->getMessage(), 'UNIQUE constraint failed');
+    }
+}
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\app\Http\Controllers\AuthController.php ===
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use App\Mail\SendOtpMail;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
+
+class AuthController extends Controller
+{
+    public function showLogin() {
+        return view('auth.login');
+    }
+
+    public function login(Request $request) {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect('/student/dashboard');
+        }
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ]);
+    }
+
+    public function showRegister() {
+        return view('auth.register');
+    }
+
+    public function register(Request $request) {
+        $data = $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'phone' => ['required', 'string', 'max:20'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = User::create([
+            'name' => trim($data['first_name'].' '.$data['last_name']),
+            'email' => $data['email'],
+            'role' => 'student',
+            'phone_number' => $data['phone'],
+            'password' => Hash::make($data['password']),
+        ]);
+
+        Auth::login($user);
+
+        return redirect()->route('student.profile')->with('success', 'Account created successfully.');
+    }
+
+    // --- OTP Forgot Password Methods ---
+
+    // 1. Send OTP Code to Email
+    public function sendOtpCode(Request $request)
+    {
+        $request->validate(['email' => 'required|email|exists:users,email']);
+
+        $user = User::where('email', $request->email)->first();
+        
+        // Generate a random 6-digit code
+        $otp = rand(100000, 999999);
+        
+        $user->otp_code = $otp;
+        $user->otp_expires_at = Carbon::now()->addMinutes(10); // Code valid for 10 mins
+        $user->save();
+
+        try {
+            // Send the styled HTML email using our Mailable class
+            Mail::to($user->email)->send(new SendOtpMail($otp));
+
+            return response()->json(['success' => true, 'message' => 'Verification code sent to your Gmail!']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Mail Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // 2. Verify OTP Code
+    public function verifyOtpCode(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp_code' => 'required|string|size:6',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || $user->otp_code !== $request->otp_code) {
+            return response()->json(['success' => false, 'message' => 'Invalid verification code.'], 422);
+        }
+
+        if (Carbon::now()->greaterThan($user->otp_expires_at)) {
+            return response()->json(['success' => false, 'message' => 'Verification code has expired. Please request a new one.'], 422);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Code verified successfully!']);
+    }
+
+    // 3. Reset Password
+    public function resetPasswordWithOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp_code' => 'required|string|size:6',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || $user->otp_code !== $request->otp_code || Carbon::now()->greaterThan($user->otp_expires_at)) {
+            return response()->json(['success' => false, 'message' => 'Invalid or expired session. Please start over.'], 422);
+        }
+
+        // Update password and clear OTP
+        $user->password = Hash::make($request->password);
+        $user->otp_code = null;
+        $user->otp_expires_at = null;
+        $user->save();
+
+        return response()->json(['success' => true, 'message' => 'Password changed successfully! Redirecting...']);
+    }
+
+    // Logout functionality
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/login');
+    }
+}
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\app\Http\Controllers\Controller.php ===
+<?php
+
+namespace App\Http\Controllers;
+
+abstract class Controller
+{
+    //
+}
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\app\Http\Controllers\CourseAssignmentController.php ===
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Course;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class CourseAssignmentController extends Controller
+{
+    // Restricts this one utility page to specific accounts — not a new
+    // role or permission system, just an allowlist check.
+    private const ADMIN_EMAILS = [
+        'lecturer@smartattendance.test', // TODO: replace with your real admin email(s)
+    ];
+
+    private function ensureAdmin(): void
+    {
+        if (!in_array(auth()->user()->email, self::ADMIN_EMAILS, true)) {
+            abort(403, 'Not authorized to manage course assignments.');
+        }
+    }
+
+    public function index()
+    {
+        $this->ensureAdmin();
+
+        $courses = Course::with('lecturer')->orderBy('level')->orderBy('semester')->orderBy('course_code')->get();
+        $lecturers = User::where('role', 'lecturer')->orderBy('name')->get();
+
+        return view('admin.course-assignments', compact('courses', 'lecturers'));
+    }
+
+    public function update(Request $request, Course $course)
+    {
+        $this->ensureAdmin();
+
+        $data = $request->validate([
+            'lecturer_id' => ['nullable', 'exists:users,id'],
+        ]);
+
+        $course->update(['lecturer_id' => $data['lecturer_id'] ?? null]);
+
+        return back()->with('success', "Updated {$course->course_code}.");
+    }
+}
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\app\Http\Controllers\PasswordResetController.php ===
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+
+class PasswordResetController extends Controller
+{
+    // 1. Send 6-digit OTP code to email
+    public function sendCode(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email'
+        ], [
+            'email.exists' => 'No account found with this email address.'
+        ]);
+
+        $email = $request->email;
+        $code = rand(100000, 999999);
+
+        // Store code in cache for 10 minutes
+        Cache::put('pwd_reset_' . $email, $code, now()->addMinutes(10));
+
+        // Send Email (Falls back to log if mail server isn't active yet)
+        try {
+            Mail::raw("Your Smart Attendance password reset code is: {$code}. It expires in 10 minutes.", function ($message) use ($email) {
+                $message->to($email)->subject('Password Reset Verification Code');
+            });
+        } catch (\Exception $e) {
+            Log::info("Password Reset OTP for {$email}: {$code}");
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'A 6-digit verification code has been sent to your Gmail.'
+        ]);
+    }
+
+    // 2. Verify the 6-digit code
+    public function verifyCode(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'code' => 'required|numeric|digits:6'
+        ]);
+
+        $cachedCode = Cache::get('pwd_reset_' . $request->email);
+
+        if (!$cachedCode || $cachedCode != $request->code) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired verification code.'
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Code verified successfully! Enter your new password.'
+        ]);
+    }
+
+    // 3. Update the password in the database
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'code' => 'required|numeric',
+            'password' => 'required|string|min:8|confirmed'
+        ]);
+
+        $cachedCode = Cache::get('pwd_reset_' . $request->email);
+
+        if (!$cachedCode || $cachedCode != $request->code) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Session expired. Please request a new code.'
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User account not found.'
+            ], 404);
+        }
+
+        // Update database with hashed new password
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        // Clear the code from cache
+        Cache::forget('pwd_reset_' . $request->email);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password changed successfully!'
+        ]);
+    }
+}
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\app\Http\Controllers\StudentController.php ===
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\AttendanceSession;
+use App\Models\Course;
+use App\Models\Attendance;
+use App\Models\LoginActivity;
+use App\Models\Timetable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+class StudentController extends Controller
+{
+    private const LEVEL_OPTIONS = [
+        '100' => 'ND1',
+        '200' => 'ND2',
+        '300' => 'HND1',
+        '400' => 'HND2',
+    ];
+
+    private const LEVEL_MAP = [
+        'ND1' => '100', '100' => '100',
+        'ND2' => '200', '200' => '200',
+        'HND1' => '300', '300' => '300',
+        'HND2' => '400', '400' => '400',
+    ];
+
+    private function levelOptions(): array
+    {
+        return self::LEVEL_OPTIONS;
+    }
+
+    private function levelLabel(?string $level): string
+    {
+        return self::LEVEL_OPTIONS[$level]
+            ?? ($level ? $level . ' Level' : 'N/A');
+    }
+
+    private function normalizeLevel(?string $level): string
+    {
+        return self::LEVEL_MAP[$level] ?? '100';
+    }
+
+    private function normalizeSemester(?string $semester): string
+    {
+        return (stripos((string) $semester, 'Second') !== false) ? 'Second' : 'First';
+    }
+
+    /**
+     * Student profile page.
+     */
+    public function profileView(Request $request)
+    {
+        $user = Auth::user();
+
+        $selectedLevel = $request->input('level', $user->level ?: '100');
+        $selectedSemester = $request->input('semester', $user->semester ?: 'First');
+
+        $configLevelKey = $this->normalizeLevel($selectedLevel);
+        $semesterKey = $this->normalizeSemester($selectedSemester);
+
+        $student = (object) [
+            'name' => $user->name,
+            'email' => $user->email,
+            'matric_number' => $user->matric_number ?? '',
+            'department' => $user->department ?? '',
+            'phone_number' => $user->phone_number ?? '',
+            'level' => $selectedLevel,
+            'semester' => $selectedSemester,
+            'level_label' => $this->levelLabel($selectedLevel),
+        ];
+
+        $curriculum = config('curriculum.levels', []);
+        $levelData = $curriculum[$configLevelKey] ?? [];
+        $curriculumCourses = $levelData['semesters'][$semesterKey] ?? [];
+
+        foreach ($curriculumCourses as $courseData) {
+            $course = Course::where('course_code', $courseData['code'])
+                ->where('level', $configLevelKey)
+                ->where('semester', $semesterKey)
+                ->first() ?? new Course();
+
+            $course->course_code = $courseData['code'];
+            $course->level = $configLevelKey;
+            $course->semester = $semesterKey;
+            $course->course_title = $courseData['title'];
+            $course->department = 'Computer Science';
+            $course->units = $courseData['units'] ?? 3;
+            $course->save();
+        }
+
+        $courseCodes = collect($curriculumCourses)->pluck('code')->values()->all();
+
+        $availableCourses = Course::query()
+            ->where('level', $configLevelKey)
+            ->where('semester', $semesterKey)
+            ->whereIn('course_code', $courseCodes)
+            ->orderBy('course_code')
+            ->get();
+
+        $enrolledCourseIds = $user->courses()->pluck('courses.id')->all();
+
+        $recentLogins = LoginActivity::where('user_id', $user->id)
+            ->latest('logged_in_at')
+            ->take(5)
+            ->get();
+
+        return view('student.profile', [
+            'user' => $user,
+            'student' => $student,
+            'levelOptions' => $this->levelOptions(),
+            'selectedLevel' => $selectedLevel,
+            'selectedSemester' => $selectedSemester,
+            'availableCourses' => $availableCourses,
+            'enrolledCourseIds' => $enrolledCourseIds,
+            'recentLogins' => $recentLogins,
+        ]);
+    }
+
+    /**
+     * Terminate or log out a specific login activity session.
+     */
+    public function logoutSession($id)
+    {
+        $user = Auth::user();
+        $login = LoginActivity::where('id', $id)->where('user_id', $user->id)->first();
+
+        if ($login) {
+            $login->delete();
+            return response()->json(['success' => true, 'message' => 'Session terminated successfully.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Session not found.'], 404);
+    }
+
+    /**
+     * Student dashboard.
+     */
+    public function dashboard()
+    {
+        $user = Auth::user();
+        $courses = $user->courses()->orderBy('course_code')->get();
+        $courseCodes = $courses->pluck('course_code');
+
+        $activeSession = AttendanceSession::where('is_active', true)
+            ->whereIn('course_code', $courseCodes)
+            ->latest()
+            ->first();
+
+        $hasCheckedInActive = false;
+        if ($activeSession) {
+            $hasCheckedInActive = Attendance::where('attendance_session_id', $activeSession->id)
+                ->where('user_id', $user->id)
+                ->exists();
+        }
+
+        $attendanceCount = Attendance::where('user_id', $user->id)->count();
+
+        $recentAttendances = Attendance::with('session')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $timetableCount = Timetable::whereIn('course_code', $courseCodes)->count();
+
+        $attendedByCourse = Attendance::with('session')
+            ->where('user_id', $user->id)
+            ->get()
+            ->groupBy(fn ($attendance) => $attendance->session->course_code ?? 'unknown')
+            ->map->count();
+
+        $totalSessionsByCourse = AttendanceSession::whereIn('course_code', $courseCodes)
+            ->get()
+            ->groupBy('course_code')
+            ->map->count();
+
+        $courseAttendanceStats = $courses->map(function ($course) use ($attendedByCourse, $totalSessionsByCourse) {
+            $attended = $attendedByCourse->get($course->course_code, 0);
+            $total = $totalSessionsByCourse->get($course->course_code, 0);
+
+            return (object) [
+                'course_code' => $course->course_code,
+                'course_title' => $course->course_title,
+                'attended' => $attended,
+                'total' => $total,
+            ];
+        });
+
+        return view('student_dashboard', compact(
+            'courses',
+            'activeSession',
+            'hasCheckedInActive',
+            'attendanceCount',
+            'recentAttendances',
+            'timetableCount',
+            'courseAttendanceStats'
+        ));
+    }
+
+    /**
+     * Camera / QR scanner.
+     */
+    public function cameraScan()
+    {
+        return view('student.camera_scan');
+    }
+
+    /**
+     * Student timetable.
+     */
+    public function timetableView(Request $request)
+    {
+        $user = Auth::user();
+        $curriculum = config('curriculum.levels', []);
+
+        $selectedLevel = $user->level ?: '100';
+        $selectedSemester = $user->semester ?: 'First';
+
+        $configLevelKey = $this->normalizeLevel($selectedLevel);
+        $semesterKey = $this->normalizeSemester($selectedSemester);
+
+        $selectedLevelData = $curriculum[$configLevelKey] ?? [];
+        $semesters = $selectedLevelData['semesters'] ?? [];
+        $semesterCourses = $semesters[$semesterKey] ?? [];
+
+        $levelCourses = collect($semesterCourses);
+        $levelCourseCodes = $levelCourses->pluck('code')->all();
+
+        $enrolledCourseCodes = $user->courses()->pluck('course_code')->all();
+
+        $timetables = Timetable::whereIn('course_code', $levelCourseCodes)
+            ->get()
+            ->keyBy('course_code');
+
+        return view('student.timetable', [
+            'selectedLevelLabel' => $this->levelLabel($configLevelKey),
+            'selectedSemester' => $semesterKey,
+            'levelCourses' => $levelCourses,
+            'courseCodes' => $enrolledCourseCodes,
+            'timetables' => $timetables,
+        ]);
+    }
+
+    /**
+     * Generate course registration form.
+     */
+    public function courseForm(Request $request)
+    {
+        $user = Auth::user();
+        $selectedSemester = $user->semester ? $user->semester . ' Semester' : 'First Semester';
+        $enrolledCourses = $user->courses()->orderBy('course_code')->get();
+
+        return view('student.course-form', [
+            'user' => $user,
+            'enrolledCourses' => $enrolledCourses,
+            'selectedSemester' => $selectedSemester,
+            'levelLabel' => $this->levelLabel($user->level),
+        ]);
+    }
+
+    /**
+     * Update student profile.
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'matric_number' => ['nullable', 'string', 'max:255'],
+            'phone_number' => ['nullable', 'string', 'max:20'],
+            'department' => ['nullable', 'string', 'max:255'],
+            'level' => ['nullable', 'in:100,200,300,400,ND1,ND2,HND1,HND2'],
+            'semester' => ['nullable', 'string'],
+            'courses' => ['nullable', 'array'],
+            'courses.*' => ['integer', 'exists:courses,id'],
+            'photo' => ['nullable', 'image', 'max:2048'],
+            'current_password' => ['required', 'current_password'],
+        ]);
+
+        $user->update([
+            'name' => $data['name'],
+            'matric_number' => $data['matric_number'] ?? null,
+            'phone_number' => $data['phone_number'] ?? null,
+            'department' => $data['department'] ?? null,
+            'level' => $data['level'] ?? null,
+            'semester' => $data['semester'] ?? 'First',
+        ]);
+
+        if ($request->hasFile('photo')) {
+            if ($user->profile_photo_path) {
+                Storage::disk('public')->delete($user->profile_photo_path);
+            }
+
+            $path = $request->file('photo')->store('profile-photos', 'public');
+            $user->update(['profile_photo_path' => $path]);
+        }
+
+        $user->courses()->sync($data['courses'] ?? []);
+
+        return redirect()
+            ->route('student.profile')
+            ->with('success', 'Profile updated successfully!');
+    }
+}
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\0001_01_01_000000_create_users_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('email')->unique();
+    $table->timestamp('email_verified_at')->nullable();
+    $table->string('password');
+
+    // Add these here:
+    $table->string('matric_number')->nullable();
+    $table->string('phone_number')->nullable();
+    $table->string('department')->nullable();
+    $table->string('level')->nullable();
+
+    $table->rememberToken();
+    $table->timestamps();
+});
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('sessions');
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\0001_01_01_000001_create_cache_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('cache', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->mediumText('value');
+            $table->integer('expiration')->index();
+        });
+
+        Schema::create('cache_locks', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->string('owner');
+            $table->integer('expiration')->index();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('cache');
+        Schema::dropIfExists('cache_locks');
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\0001_01_01_000002_create_jobs_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
+
+        Schema::create('job_batches', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->string('name');
+            $table->integer('total_jobs');
+            $table->integer('pending_jobs');
+            $table->integer('failed_jobs');
+            $table->longText('failed_job_ids');
+            $table->mediumText('options')->nullable();
+            $table->integer('cancelled_at')->nullable();
+            $table->integer('created_at');
+            $table->integer('finished_at')->nullable();
+        });
+
+        Schema::create('failed_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('uuid')->unique();
+            $table->text('connection');
+            $table->text('queue');
+            $table->longText('payload');
+            $table->longText('exception');
+            $table->timestamp('failed_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('jobs');
+        Schema::dropIfExists('job_batches');
+        Schema::dropIfExists('failed_jobs');
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_06_25_113050_create_attendance_sessions_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('attendance_sessions', function (Blueprint $table) {
+            $table->id();
+            $table->string('course_code'); // e.g., CSC 301
+            $table->string('session_token')->unique(); // Unique token for the QR code
+            $table->boolean('is_active')->default(true); // To open/close attendance
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('attendance_sessions');
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_06_25_113105_create_attendances_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('attendances', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // The student
+            $table->foreignId('attendance_session_id')->constrained()->onDelete('cascade'); // The class session
+            $table->timestamp('scanned_at');
+            $table->timestamps();
+            
+            // Prevents a student from scanning into the same session twice
+            $table->unique(['user_id', 'attendance_session_id']); 
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('attendances');
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_06_28_190050_create_timetables_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('timetables', function (Blueprint $table) {
+            $table->id();
+            $table->string('course_code');
+            $table->string('day_of_week'); // e.g., 'Monday', 'Sunday'
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('timetables');
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_06_29_083057_create_courses_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('courses', function (Blueprint $table) {
+            $table->id();
+            $table->string('course_code')->unique(); // e.g., CSC301
+            $table->string('course_title');         // e.g., Advanced Web Development
+            $table->string('level');                // e.g., 300L
+            $table->string('department');           // e.g., Computer Science
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('courses');
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_06_29_083112_create_course_user_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('course_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('course_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('course_user');
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_19_000001_add_role_to_users_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('role')->default('student')->after('password');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('role');
+        });
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_22_000001_add_profile_photo_to_users_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('profile_photo_path')->nullable()->after('level');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('profile_photo_path');
+        });
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_22_000002_add_semester_and_units_to_courses_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('courses', function (Blueprint $table) {
+            if (!Schema::hasColumn('courses', 'semester')) {
+                $table->string('semester')->nullable()->after('level');
+            }
+            if (!Schema::hasColumn('courses', 'units')) {
+                $table->unsignedTinyInteger('units')->default(3)->after('semester');
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('courses', function (Blueprint $table) {
+            $table->dropColumn(['semester', 'units']);
+        });
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_22_000003_add_semester_to_users_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            if (!Schema::hasColumn('users', 'semester')) {
+                $table->string('semester')->nullable()->after('level');
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('semester');
+        });
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_22_000004_fix_courses_unique_index.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // Rows in `courses` are fully regenerated from config/curriculum.php
+        // every time profileView() runs, so it's safe to clear out whatever
+        // is here now - including the stale rows (null/mismatched semester)
+        // left behind by the earlier broken version of the code that are
+        // causing the duplicate-entry error.
+        // Uses delete() rather than truncate() because course_user has a
+        // foreign key onto courses.id; delete() lets that cascade cleanly.
+        DB::table('courses')->delete();
+
+        Schema::table('courses', function (Blueprint $table) {
+            // Drop the old single-column unique index (this is the default
+            // name Laravel gave it: courses_course_code_unique).
+            $table->dropUnique('courses_course_code_unique');
+
+            // The app looks up/creates courses by this compound key, so the
+            // database constraint needs to match it.
+            $table->unique(['course_code', 'level', 'semester'], 'courses_code_level_semester_unique');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('courses', function (Blueprint $table) {
+            $table->dropUnique('courses_code_level_semester_unique');
+            $table->unique('course_code');
+        });
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_23_000001_add_token_generated_at_to_attendance_sessions_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('attendance_sessions', function (Blueprint $table) {
+            // Timestamp of when the *current* session_token was issued.
+            // Every scan is validated against how old this is — that's
+            // what makes a screenshotted/forwarded QR code stop working
+            // a few seconds after it's captured.
+            $table->timestamp('token_generated_at')->nullable()->after('session_token');
+        });
+
+        // Backfill existing rows so nothing already-active gets treated
+        // as "infinitely stale" the moment this migration runs.
+        DB::table('attendance_sessions')
+            ->whereNull('token_generated_at')
+            ->update(['token_generated_at' => now()]);
+    }
+
+    public function down(): void
+    {
+        Schema::table('attendance_sessions', function (Blueprint $table) {
+            $table->dropColumn('token_generated_at');
+        });
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_23_000002_add_unique_index_to_attendances_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // Safety net: if any duplicate (session, user) rows already
+        // exist from before this fix, keep only the earliest scan per
+        // pair so the unique index below can actually be created.
+        $duplicates = DB::table('attendances')
+            ->select('attendance_session_id', 'user_id', DB::raw('MIN(id) as keep_id'))
+            ->groupBy('attendance_session_id', 'user_id')
+            ->havingRaw('COUNT(*) > 1')
+            ->get();
+
+        foreach ($duplicates as $dup) {
+            DB::table('attendances')
+                ->where('attendance_session_id', $dup->attendance_session_id)
+                ->where('user_id', $dup->user_id)
+                ->where('id', '!=', $dup->keep_id)
+                ->delete();
+        }
+
+        Schema::table('attendances', function (Blueprint $table) {
+            // The application already checks "already checked in" before
+            // inserting, but that check-then-insert has a race window
+            // under concurrent requests. This index is the hard backstop:
+            // the database itself will refuse a second row for the same
+            // student in the same session, no matter how the request
+            // arrived.
+            $table->unique(['attendance_session_id', 'user_id'], 'attendance_session_user_unique');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('attendances', function (Blueprint $table) {
+            $table->dropUnique('attendance_session_user_unique');
+        });
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_23_120000_add_is_hod_to_users_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean('is_hod')->default(false)->after('role');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('is_hod');
+        });
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_23_120001_add_lecturer_id_to_attendance_sessions_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('attendance_sessions', function (Blueprint $table) {
+            $table->foreignId('lecturer_id')->nullable()->after('id')->constrained('users')->nullOnDelete();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('attendance_sessions', function (Blueprint $table) {
+            $table->dropConstrainedForeignId('lecturer_id');
+        });
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_24_000001_add_lecturer_id_to_courses_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('courses', function (Blueprint $table) {
+            $table->foreignId('lecturer_id')->nullable()->after('id')->constrained('users')->nullOnDelete();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('courses', function (Blueprint $table) {
+            $table->dropConstrainedForeignId('lecturer_id');
+        });
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_25_154121_add_otp_columns_to_users_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('otp_code')->nullable()->after('password');
+            $table->timestamp('otp_expires_at')->nullable()->after('otp_code');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['otp_code', 'otp_expires_at']);
+        });
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_26_000001_create_login_activities_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('login_activities', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('ip_address', 45);
+            $table->text('user_agent')->nullable();
+            $table->timestamp('logged_in_at');
+            $table->timestamps();
+
+            $table->index(['user_id', 'ip_address']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('login_activities');
+    }
+};
+
+
+=== FILE: C:\xampp\htdocs\smart-attendance 2\smart-attendance\database\migrations\2026_08_28_021615_add_session_id_to_login_activities_table.php ===
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('login_activities', function (Blueprint $table) {
+            if (!Schema::hasColumn('login_activities', 'session_id')) {
+                $table->string('session_id')->nullable()->after('user_agent');
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('login_activities', function (Blueprint $table) {
+            $table->dropColumn('session_id');
+        });
+    }
+};
