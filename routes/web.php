@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('auth.login');
-});
+    return view('welcome');
+})->name('home');
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -104,7 +104,12 @@ Route::post('/password/otp/send', [AuthController::class, 'sendOtpCode'])->name(
 Route::post('/password/otp/verify', [AuthController::class, 'verifyOtpCode'])->name('password.otp.verify');
 Route::post('/password/otp/reset', [AuthController::class, 'resetPasswordWithOtp'])->name('password.otp.reset');
 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect('/');
+})->name('logout');
 
 Route::middleware(['auth', 'role:lecturer'])->group(function () {
     Route::get('/lecturer/dashboard', [AttendanceController::class, 'lecturerDashboard'])->name('lecturer.dashboard');
@@ -137,3 +142,4 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/student/scan/{token}', [AttendanceController::class, 'showScanPage'])->name('student.scan');
     Route::post('/student/log/{token}', [AttendanceController::class, 'logAttendance'])->name('student.log');
 });
+```[cite: 3]
