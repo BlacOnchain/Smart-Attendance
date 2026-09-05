@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Attendance — University Attendance Software</title>
+    <title>Smart Attendance — Departmental Academic Tracking System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .nav-glass {
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid #e2e8f0;
         }
         .showcase-card {
             background: #ffffff;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #cbd5e1;
             box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.04), 0 5px 15px -5px rgba(0, 0, 0, 0.02);
             transition: all 0.3s ease;
         }
@@ -35,7 +35,10 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012-2m-6 9l2 2 4-4" />
                     </svg>
                 </div>
-                <span class="text-lg font-extrabold tracking-tight text-slate-900">Smart Attendance</span>
+                <div>
+                    <span class="text-lg font-extrabold tracking-tight text-slate-900 block leading-tight">Smart Attendance</span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-700">Department Level System</span>
+                </div>
             </div>
             <div class="flex items-center gap-4">
                 <a href="{{ route('login') }}" class="text-sm font-semibold text-slate-700 hover:text-emerald-700 transition">Sign In</a>
@@ -48,21 +51,21 @@
 
     <!-- Hero Section -->
     <section class="mx-auto max-w-5xl px-6 pt-20 pb-16 text-center">
-        <div class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-1.5 text-xs font-bold text-emerald-800 border border-emerald-200/80 mb-6">
+        <div class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-1.5 text-xs font-bold text-emerald-800 border border-emerald-200 mb-6">
             <span class="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
-            Next-Generation Academic Verification Platform
+            Tailored Specifically for Departmental Lecture & Course Management
         </div>
         
         <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-slate-900 leading-[1.12]">
-            University attendance clock-in software
+            Departmental attendance clock-in software
         </h1>
         
         <p class="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Eliminate proxy sign-ups and manual paper registers. Automatically generate verified academic timelines and course logs from real-time student check-ins.
+            Eliminate manual paper registers and proxy sign-ups at the departmental level. Automatically generate verified academic timelines, level schedules, and course logs from real-time student check-ins.
         </p>
         
         <div class="mt-8 flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm font-semibold text-slate-500">
-            <span class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-600"></span> Verified Presence</span>
+            <span class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-600"></span> Departmental Level Scope</span>
             <span class="text-slate-300">•</span>
             <span class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-600"></span> Rolling QR Tokens</span>
             <span class="text-slate-300">•</span>
@@ -71,9 +74,9 @@
 
         <div class="mt-10">
             <a href="{{ route('login') }}" class="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition">
-                Start tracking attendance — it's free!
+                Start tracking departmental attendance — it's free!
             </a>
-            <p class="mt-3 text-xs text-slate-400 font-medium">Unlimited students &bull; Secure cloud database &bull; No setup fees</p>
+            <p class="mt-3 text-xs text-slate-400 font-medium">Departmental student database &bull; Secure cloud storage &bull; Zero paperwork</p>
         </div>
     </section>
 
@@ -86,7 +89,7 @@
                 <span class="text-6xl font-black text-slate-200 block mb-2">01</span>
                 <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Stop proxy sign-ups with rotating cryptographic tokens</h3>
                 <p class="mt-4 text-slate-600 leading-relaxed text-sm sm:text-base">
-                    Manual attendance lists are easily manipulated. Our platform projects live session codes that rotate dynamically every few seconds, ensuring students are physically present inside the lecture hall to log check-ins.
+                    Traditional departmental attendance lists are easily manipulated. Our platform projects live session codes that rotate dynamically every few seconds, ensuring students are physically present inside the lecture hall to log check-ins.
                 </p>
             </div>
             <div class="showcase-card rounded-3xl p-6 bg-slate-50/50">
@@ -109,21 +112,21 @@
         <section class="grid md:grid-cols-2 gap-12 items-center">
             <div class="showcase-card rounded-3xl p-6 bg-slate-50/50 order-2 md:order-1">
                 <div class="flex items-center justify-between pb-4 border-b border-slate-200">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Student Profile Slip</span>
-                    <span class="text-xs font-bold text-emerald-600">Official Document</span>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Departmental Student Profile</span>
+                    <span class="text-xs font-bold text-emerald-600">Official Form</span>
                 </div>
                 <div class="py-6 space-y-3">
                     <div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200">
-                        <div class="h-12 w-12 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center">MK</div>
+                        <div class="h-12 w-12 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center">JD</div>
                         <div>
-                            <p class="font-bold text-sm text-slate-900">Michael Kelvin</p>
-                            <p class="text-xs text-slate-500">Computer Science &bull; 500 Level</p>
+                            <p class="font-bold text-sm text-slate-900">Jonathan Davis</p>
+                            <p class="text-xs text-slate-500">Department of Computer Science &bull; 400 Level</p>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-white p-3 rounded-xl border border-slate-200 text-center">
                             <p class="text-[10px] text-slate-400 uppercase font-bold">Registered Units</p>
-                            <p class="text-base font-extrabold text-emerald-600 mt-0.5">24 Units</p>
+                            <p class="text-base font-extrabold text-emerald-600 mt-0.5">22 Units</p>
                         </div>
                         <div class="bg-white p-3 rounded-xl border border-slate-200 text-center">
                             <p class="text-[10px] text-slate-400 uppercase font-bold">Status</p>
@@ -134,9 +137,9 @@
             </div>
             <div class="order-1 md:order-2">
                 <span class="text-6xl font-black text-slate-200 block mb-2">02</span>
-                <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Seamless course registration & printable slips</h3>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Seamless course registration & printable departmental slips</h3>
                 <p class="mt-4 text-slate-600 leading-relaxed text-sm sm:text-base">
-                    Students can select their academic level, department, and semester courses in seconds. The platform automatically aggregates registered units and generates professional, print-ready course registration slips.
+                    Students select their respective academic levels, active semesters, and departmental courses in seconds. The system automatically calculates registered units and generates professional, print-ready course forms.
                 </p>
             </div>
         </section>
@@ -145,23 +148,23 @@
         <section class="grid md:grid-cols-2 gap-12 items-center">
             <div>
                 <span class="text-6xl font-black text-slate-200 block mb-2">03</span>
-                <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Real-time engagement tracking and instant reports</h3>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Real-time departmental engagement & analytics reports</h3>
                 <p class="mt-4 text-slate-600 leading-relaxed text-sm sm:text-base">
-                    Lecturers gain complete visibility into student attendance histories. Monitor participation trends across semesters, inspect individual student logs, and export tidy records whenever required.
+                    Departmental coordinators and lecturers gain clear visibility into student attendance metrics. Monitor class participation trends across all levels, inspect individual student logs, and export reports seamlessly.
                 </p>
             </div>
             <div class="showcase-card rounded-3xl p-6 bg-slate-50/50">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between bg-white p-3.5 rounded-2xl border border-slate-200">
-                        <span class="text-xs font-bold text-slate-700">CSC 501 Attendance Rate</span>
+                        <span class="text-xs font-bold text-slate-700">CSC 401 Attendance Rate</span>
                         <span class="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">94%</span>
                     </div>
                     <div class="flex items-center justify-between bg-white p-3.5 rounded-2xl border border-slate-200">
-                        <span class="text-xs font-bold text-slate-700">CSC 503 Attendance Rate</span>
+                        <span class="text-xs font-bold text-slate-700">CSC 403 Attendance Rate</span>
                         <span class="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">88%</span>
                     </div>
                     <div class="flex items-center justify-between bg-white p-3.5 rounded-2xl border border-slate-200">
-                        <span class="text-xs font-bold text-slate-700">CSC 505 Attendance Rate</span>
+                        <span class="text-xs font-bold text-slate-700">CSC 405 Attendance Rate</span>
                         <span class="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">96%</span>
                     </div>
                 </div>
@@ -177,9 +180,9 @@
                 </div>
                 <div class="py-8 flex flex-col items-center justify-center text-center">
                     <div class="flex gap-2 mb-3">
-                        <span class="h-10 w-10 bg-white border border-slate-300 rounded-xl flex items-center justify-center font-bold text-emerald-700 shadow-sm">7</span>
-                        <span class="h-10 w-10 bg-white border border-slate-300 rounded-xl flex items-center justify-center font-bold text-emerald-700 shadow-sm">4</span>
-                        <span class="h-10 w-10 bg-white border border-slate-300 rounded-xl flex items-center justify-center font-bold text-emerald-700 shadow-sm">2</span>
+                        <span class="h-10 w-10 bg-white border border-slate-300 rounded-xl flex items-center justify-center font-bold text-emerald-700 shadow-sm">5</span>
+                        <span class="h-10 w-10 bg-white border border-slate-300 rounded-xl flex items-center justify-center font-bold text-emerald-700 shadow-sm">9</span>
+                        <span class="h-10 w-10 bg-white border border-slate-300 rounded-xl flex items-center justify-center font-bold text-emerald-700 shadow-sm">1</span>
                         <span class="h-10 w-10 bg-white border border-slate-300 rounded-xl flex items-center justify-center font-bold text-slate-400 shadow-sm">•</span>
                     </div>
                     <p class="text-xs text-slate-500 font-medium">6-digit verification code sent to Gmail</p>
@@ -189,7 +192,7 @@
                 <span class="text-6xl font-black text-slate-200 block mb-2">04</span>
                 <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Frictionless multi-step OTP password recovery</h3>
                 <p class="mt-4 text-slate-600 leading-relaxed text-sm sm:text-base">
-                    Secure student and lecturer accounts against unauthorized access. Our multi-step email verification workflow safely manages credential updates and instant password resets without administrative delays.
+                    Secure departmental user credentials against unauthorized access. Our multi-step email verification workflow safely manages profile updates and instant password resets without administrative bottlenecks.
                 </p>
             </div>
         </section>
@@ -200,7 +203,7 @@
                 <span class="text-6xl font-black text-slate-200 block mb-2">05</span>
                 <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900">In-browser camera scanning for instant check-ins</h3>
                 <p class="mt-4 text-slate-600 leading-relaxed text-sm sm:text-base">
-                    Students don't need to install external apps. The built-in HTML5 camera scanner activates directly inside the mobile or desktop portal, capturing lecture codes instantly with smooth visual feedback.
+                    Students do not need to install heavy external apps. The built-in HTML5 camera scanner activates directly inside mobile and laptop browsers, capturing active departmental lecture codes instantly with smooth visual feedback.
                 </p>
             </div>
             <div class="showcase-card rounded-3xl p-6 bg-slate-50/50">
@@ -243,7 +246,7 @@
                 <span class="text-6xl font-black text-slate-200 block mb-2">06</span>
                 <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Cloud-synced architecture hosted securely on Railway</h3>
                 <p class="mt-4 text-slate-600 leading-relaxed text-sm sm:text-base">
-                    Every attendance log, user registration, and course update is backed by a robust PostgreSQL cloud database. Automatic synchronization ensures zero data loss and flawless multi-device reliability.
+                    Every departmental attendance log, user registration, and course update is backed by a robust PostgreSQL cloud database. Automatic synchronization ensures zero data loss and flawless multi-device reliability.
                 </p>
             </div>
         </section>
@@ -252,7 +255,7 @@
 
     <!-- Footer -->
     <footer class="border-t border-slate-200 py-10 mt-20 text-center text-xs font-bold text-slate-500 bg-slate-50">
-        <p>&copy; 2026 Smart Attendance University. All rights reserved. Built for secure academic excellence.</p>
+        <p>&copy; 2026 Smart Attendance University. Department Level Management System. All rights reserved.</p>
     </footer>
 
 </body>
