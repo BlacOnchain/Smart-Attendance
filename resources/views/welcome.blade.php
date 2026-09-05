@@ -56,7 +56,7 @@
     <header class="glass-nav sticky top-0 z-50 mx-auto px-6 py-4 transition-all">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <!-- Custom Logo matching uploaded reference -->
+                <!-- Custom Logo matching exact user reference -->
                 <div class="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-700 shadow-md shadow-emerald-600/20">
                     <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012-2m-6 9l2 2 4-4" />
@@ -165,7 +165,7 @@
         </div>
     </section>
 
-    <!-- Feature Grid Section -->
+    <!-- Feature Grid Section with Professional SVG Vector Icons -->
     <section class="relative z-10 mx-auto max-w-7xl px-6 py-16 border-t border-emerald-100">
         <div class="text-center max-w-xl mx-auto mb-16">
             <h2 class="text-xs uppercase tracking-[0.3em] text-emerald-700 font-bold">Engineered For Excellence</h2>
@@ -173,20 +173,35 @@
         </div>
 
         <div class="grid gap-8 md:grid-cols-3">
+            <!-- Card 1: Shield / Security Icon -->
             <div class="glass-card rounded-[28px] p-8 border border-emerald-200 hover:border-emerald-400 transition-all duration-300">
-                <div class="h-14 w-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-xl mb-6 shadow-md">🛡️</div>
+                <div class="h-14 w-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mb-6 shadow-md shadow-emerald-600/30">
+                    <svg class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                </div>
                 <h4 class="text-xl font-extrabold text-emerald-950">Dynamic Security Tokens</h4>
                 <p class="mt-3 text-sm text-slate-600 leading-relaxed font-medium">Rolling hashes eliminate proxy check-ins by requiring students to be physically present in the lecture theatre.</p>
             </div>
 
+            <!-- Card 2: Document / Course Stack Icon -->
             <div class="glass-card rounded-[28px] p-8 border border-emerald-200 hover:border-emerald-400 transition-all duration-300">
-                <div class="h-14 w-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-xl mb-6 shadow-md">📚</div>
+                <div class="h-14 w-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mb-6 shadow-md shadow-emerald-600/30">
+                    <svg class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                </div>
                 <h4 class="text-xl font-extrabold text-emerald-950">Automated Course Forms</h4>
                 <p class="mt-3 text-sm text-slate-600 leading-relaxed font-medium">Seamlessly map academic levels and active semesters to generate official, formatted course registration slips.</p>
             </div>
 
+            <!-- Card 3: Lightning / Fast Verification Icon -->
             <div class="glass-card rounded-[28px] p-8 border border-emerald-200 hover:border-emerald-400 transition-all duration-300">
-                <div class="h-14 w-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-xl mb-6 shadow-md">⚡</div>
+                <div class="h-14 w-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mb-6 shadow-md shadow-emerald-600/30">
+                    <svg class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
                 <h4 class="text-xl font-extrabold text-emerald-950">Multi-Step OTP Recovery</h4>
                 <p class="mt-3 text-sm text-slate-600 leading-relaxed font-medium">Advanced email verification safeguards user credentials and provides friction-free, secure password resets.</p>
             </div>
