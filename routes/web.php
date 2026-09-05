@@ -142,4 +142,3 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/student/scan/{token}', [AttendanceController::class, 'showScanPage'])->name('student.scan');
     Route::post('/student/log/{token}', [AttendanceController::class, 'logAttendance'])->name('student.log');
 });
-```[cite: 3]
