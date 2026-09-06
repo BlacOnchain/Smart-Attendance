@@ -23,30 +23,56 @@
         .auth-mesh {
             position: absolute; inset: 0;
             background:
-                radial-gradient(480px 380px at 16% 14%, rgba(13,148,136,0.16), transparent 70%),
-                radial-gradient(420px 340px at 86% 12%, rgba(5,150,105,0.11), transparent 70%),
-                radial-gradient(360px 300px at 48% 90%, rgba(67,56,202,0.06), transparent 70%);
-            filter: blur(2px);
+                radial-gradient(600px 480px at 12% 8%, rgba(13,148,136,0.26), transparent 68%),
+                radial-gradient(540px 440px at 88% 10%, rgba(5,150,105,0.17), transparent 68%),
+                radial-gradient(480px 400px at 50% 96%, rgba(67,56,202,0.10), transparent 68%);
+            filter: blur(4px);
             animation: drift 22s ease-in-out infinite alternate;
             pointer-events: none;
         }
         @keyframes drift {
             from { transform: translate3d(0,0,0) scale(1); }
-            to   { transform: translate3d(2%, -2%, 0) scale(1.05); }
+            to   { transform: translate3d(2%, -2%, 0) scale(1.06); }
+        }
+        .grain {
+            position: absolute; inset: 0;
+            background-image: radial-gradient(rgba(16,32,26,0.05) 1px, transparent 1px);
+            background-size: 24px 24px;
+            mask-image: radial-gradient(circle at 30% 30%, black, transparent 72%);
+            -webkit-mask-image: radial-gradient(circle at 30% 30%, black, transparent 72%);
+            pointer-events: none;
         }
 
         .glass-panel {
-            background: rgba(255,255,255,0.6);
-            border: 1px solid rgba(255,255,255,0.7);
-            backdrop-filter: blur(20px) saturate(160%);
-            -webkit-backdrop-filter: blur(20px) saturate(160%);
-            box-shadow: 0 24px 60px -20px rgba(16,32,26,0.16);
+            background: rgba(255,255,255,0.84);
+            border: 1px solid rgba(255,255,255,0.95);
+            backdrop-filter: blur(24px) saturate(170%);
+            -webkit-backdrop-filter: blur(24px) saturate(170%);
+            box-shadow: 0 32px 80px -18px rgba(16,32,26,0.24), inset 0 1px 0 rgba(255,255,255,0.9);
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-panel::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--brand), transparent 75%);
         }
         .glass-chip {
-            background: rgba(255,255,255,0.55);
-            border: 1px solid rgba(255,255,255,0.7);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            background: rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.95);
+            box-shadow: 0 14px 34px -14px rgba(16,32,26,0.2);
+        }
+        .chip-icon {
+            width: 30px; height: 30px; border-radius: 9px;
+            background: rgba(13,148,136,0.1);
+            border: 1px solid rgba(13,148,136,0.22);
+            color: var(--brand-dark);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 10px;
+        }
+        .input-icon {
+            position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+            color: #9aa39c; pointer-events: none;
         }
 
         .tag-badge {
@@ -66,9 +92,10 @@
         .field-label { font-size: 13px; font-weight: 500; color: #5b6660; margin-bottom: 6px; display: block; }
 
         .glass-input {
-            background: rgba(255,255,255,0.7);
-            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.85);
+            border: 1px solid #d7dbd2;
             color: var(--ink);
+            box-shadow: 0 1px 2px rgba(16,32,26,0.04), inset 0 1px 0 rgba(255,255,255,0.6);
             transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
         .glass-input::placeholder { color: #9aa39c; }
@@ -102,6 +129,7 @@
 <body>
     <div class="relative min-h-screen overflow-hidden">
         <div class="auth-mesh"></div>
+        <div class="grain"></div>
 
         <div class="relative z-10 grid min-h-screen lg:grid-cols-2">
             <!-- Sign-in panel -->
@@ -132,15 +160,19 @@
                             @csrf
                             <div>
                                 <label class="field-label">Email address</label>
-                                <input type="email" name="email" value="{{ old('email') }}" required placeholder="you@example.com"
-                                       class="glass-input w-full rounded-2xl px-4 py-3">
+                                <div class="relative">
+                                    <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5L12 13l8.5-6.5"/></svg>
+                                    <input type="email" name="email" value="{{ old('email') }}" required placeholder="you@example.com"
+                                           class="glass-input w-full rounded-2xl pl-11 pr-4 py-3">
+                                </div>
                             </div>
 
                             <div>
                                 <label class="field-label">Password</label>
                                 <div class="relative">
+                                    <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 118 0v3"/></svg>
                                     <input type="password" id="passwordInput" name="password" required placeholder="••••••••"
-                                           class="glass-input w-full rounded-2xl px-4 py-3 pr-11">
+                                           class="glass-input w-full rounded-2xl pl-11 pr-11 py-3">
                                     <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 flex items-center pr-4 hover:opacity-70" style="color:#7a8580" aria-label="Toggle password visibility">
                                         <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
@@ -173,18 +205,30 @@
                     </p>
                 </div>
 
-                <div class="anim-slide-right grid gap-4 sm:grid-cols-3" style="--d: 0.2s">
+                <div class="anim-scale glass-panel rounded-2xl p-5 flex items-center gap-3 max-w-sm" style="--d: 0.16s">
+                    <span class="relative flex h-2.5 w-2.5 shrink-0">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full" style="background: var(--brand); opacity:.6"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5" style="background: var(--brand)"></span>
+                    </span>
+                    <span class="text-sm" style="color:#5b6660">CSC 401 · session open</span>
+                    <span class="mono text-sm font-semibold ml-auto" style="color: var(--brand-dark)">18 checked in</span>
+                </div>
+
+                <div class="anim-slide-right grid gap-4 sm:grid-cols-3" style="--d: 0.24s">
                     <div class="glass-chip lift-hover rounded-2xl p-5">
+                        <div class="chip-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L20 6.5V17.5L12 22L4 17.5V6.5L12 2Z"/><circle cx="12" cy="12" r="2.2"/></svg></div>
                         <p class="text-sm" style="color:#5b6660">Sessions</p>
-                        <p class="mt-2 text-xl font-semibold">Live</p>
+                        <p class="mt-1 text-xl font-semibold">Live</p>
                     </div>
                     <div class="glass-chip lift-hover rounded-2xl p-5">
+                        <div class="chip-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></div>
                         <p class="text-sm" style="color:#5b6660">Students</p>
-                        <p class="mt-2 text-xl font-semibold">Check-in</p>
+                        <p class="mt-1 text-xl font-semibold">Check-in</p>
                     </div>
                     <div class="glass-chip lift-hover rounded-2xl p-5">
+                        <div class="chip-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12h8M12 8v8"/></svg></div>
                         <p class="text-sm" style="color:#5b6660">Course</p>
-                        <p class="mt-2 text-xl font-semibold">QR code</p>
+                        <p class="mt-1 text-xl font-semibold">QR code</p>
                     </div>
                 </div>
             </aside>
