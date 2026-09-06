@@ -18,7 +18,7 @@
         }
         * { font-family: 'IBM Plex Sans', system-ui, sans-serif; }
         .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
-        body { background: var(--paper); color: var(--ink); }
+        body { background: linear-gradient(180deg, #eef6f1 0%, #f6f8f2 22%, #fbfbf7 45%, #f4f7f1 70%, #eef5f0 100%); color: var(--ink); }
 
         .nav-glass {
             background: rgba(251, 251, 247, 0.82);
@@ -76,6 +76,16 @@
             background: #ffffff;
             border: 1px solid var(--line);
             box-shadow: 0 20px 45px -20px rgba(16,32,26,0.12);
+            position: relative;
+            z-index: 1;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            inset: -22% -16%;
+            background: radial-gradient(closest-side, var(--accent-soft, rgba(5,150,105,0.12)), transparent 70%);
+            filter: blur(10px);
+            z-index: -1;
         }
 
         /* ---- scroll reveals: varied, not identical ---- */
@@ -374,7 +384,7 @@
                     Nothing to install. The scanner opens straight in the browser, on a phone or a laptop, and reads the current code the moment it's in frame.
                 </p>
             </div>
-            <div class="reveal feature-card rounded-2xl p-8 overflow-hidden" data-anim="scale">
+            <div class="reveal feature-card rounded-2xl p-8" data-anim="scale">
                 <div class="flex justify-center">
                     <div class="relative h-32 w-52 rounded-xl bg-neutral-950 overflow-hidden">
                         <span class="absolute top-2.5 left-2.5 h-3.5 w-3.5 border-t-2 border-l-2 border-sky-400 rounded-tl-sm"></span>
