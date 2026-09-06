@@ -18,14 +18,14 @@
         }
         * { font-family: 'IBM Plex Sans', system-ui, sans-serif; }
         .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
-        body { background: var(--paper); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
+        body { background: linear-gradient(160deg, #e9f4ec 0%, #f6f8f2 48%, #eef6f1 100%); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
 
         .auth-mesh {
             position: absolute; inset: 0;
             background:
-                radial-gradient(600px 480px at 12% 8%, rgba(13,148,136,0.26), transparent 68%),
-                radial-gradient(540px 440px at 88% 10%, rgba(5,150,105,0.17), transparent 68%),
-                radial-gradient(480px 400px at 50% 96%, rgba(67,56,202,0.10), transparent 68%);
+                radial-gradient(760px 620px at 10% 2%, rgba(13,148,136,0.40), transparent 62%),
+                radial-gradient(700px 580px at 92% 4%, rgba(5,150,105,0.26), transparent 62%),
+                radial-gradient(680px 560px at 48% 98%, rgba(67,56,202,0.18), transparent 62%);
             filter: blur(4px);
             animation: drift 22s ease-in-out infinite alternate;
             pointer-events: none;
@@ -38,8 +38,8 @@
             position: absolute; inset: 0;
             background-image: radial-gradient(rgba(16,32,26,0.05) 1px, transparent 1px);
             background-size: 24px 24px;
-            mask-image: radial-gradient(circle at 30% 30%, black, transparent 72%);
-            -webkit-mask-image: radial-gradient(circle at 30% 30%, black, transparent 72%);
+            mask-image: radial-gradient(circle at 40% 35%, black, transparent 88%);
+            -webkit-mask-image: radial-gradient(circle at 40% 35%, black, transparent 88%);
             pointer-events: none;
         }
 
