@@ -10,6 +10,7 @@ class LoginActivity extends Model
         'user_id',
         'ip_address',
         'user_agent',
+        'session_id',
         'logged_in_at',
     ];
 
