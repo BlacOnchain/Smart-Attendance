@@ -4,9 +4,11 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseAssignmentController;
 use App\Http\Controllers\StudentController;
+use App\Mail\NewDeviceLoginAlert;
 use App\Models\LoginActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -41,8 +43,21 @@ Route::post('/login', function (Request $request) {
             'user_id' => $user->id,
             'ip_address' => $ip,
             'user_agent' => $request->userAgent(),
+            'session_id' => $request->session()->getId(),
             'logged_in_at' => now(),
         ]);
+
+        if ($isNewIp) {
+            try {
+                Mail::to($user->email)->send(
+                    new NewDeviceLoginAlert($user, $ip, $request->userAgent(), now())
+                );
+            } catch (\Exception $e) {
+                // Never block a legitimate login over a mail delivery failure.
+                // With MAIL_MAILER=log this should never actually throw locally.
+                report($e);
+            }
+        }
 
         $target = $user && $user->role === 'lecturer'
             ? route('lecturer.dashboard')
@@ -78,8 +93,19 @@ Route::post('/lecturer/login', function (Request $request) {
                 'user_id' => $user->id,
                 'ip_address' => $ip,
                 'user_agent' => $request->userAgent(),
+                'session_id' => $request->session()->getId(),
                 'logged_in_at' => now(),
             ]);
+
+            if ($isNewIp) {
+                try {
+                    Mail::to($user->email)->send(
+                        new NewDeviceLoginAlert($user, $ip, $request->userAgent(), now())
+                    );
+                } catch (\Exception $e) {
+                    report($e);
+                }
+            }
 
             return redirect()->intended(route('lecturer.dashboard'));
         }
@@ -130,7 +156,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/student/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
     Route::get('/student/profile', [StudentController::class, 'profileView'])->name('student.profile');
     Route::post('/student/profile/update', [StudentController::class, 'updateProfile'])->name('student.profile.update');
-    
+
     // Session termination route
     Route::post('/student/profile/logout-session/{id}', [StudentController::class, 'logoutSession'])->name('student.profile.logout-session');
 

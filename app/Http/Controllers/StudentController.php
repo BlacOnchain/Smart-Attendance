@@ -9,6 +9,7 @@ use App\Models\LoginActivity;
 use App\Models\Timetable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
@@ -116,23 +117,54 @@ class StudentController extends Controller
             'availableCourses' => $availableCourses,
             'enrolledCourseIds' => $enrolledCourseIds,
             'recentLogins' => $recentLogins,
+            // Lets the view mark which row in the list is the device you're using right now.
+            'currentSessionId' => $request->session()->getId(),
         ]);
     }
 
     /**
-     * Terminate or log out a specific login activity session.
+     * Terminate a specific login session.
+     *
+     * This deletes the row from Laravel's own `sessions` table (which is what
+     * actually forces that device to be logged out on its next request), not
+     * just the login_activities history row. If the session being terminated
+     * is the one making this very request, we log the current browser out
+     * too and tell the frontend so it can redirect to the login page.
      */
-    public function logoutSession($id)
+    public function logoutSession(Request $request, $id)
     {
         $user = Auth::user();
         $login = LoginActivity::where('id', $id)->where('user_id', $user->id)->first();
 
-        if ($login) {
-            $login->delete();
-            return response()->json(['success' => true, 'message' => 'Session terminated successfully.']);
+        if (! $login) {
+            return response()->json(['success' => false, 'message' => 'Session not found.'], 404);
         }
 
-        return response()->json(['success' => false, 'message' => 'Session not found.'], 404);
+        $isCurrentSession = $login->session_id && $login->session_id === $request->session()->getId();
+
+        if ($login->session_id) {
+            DB::table('sessions')->where('id', $login->session_id)->delete();
+        }
+
+        $login->delete();
+
+        if ($isCurrentSession) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return response()->json([
+                'success' => true,
+                'current_session' => true,
+                'message' => 'You have been logged out of this device.',
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'current_session' => false,
+            'message' => 'That device has been logged out.',
+        ]);
     }
 
     /**
