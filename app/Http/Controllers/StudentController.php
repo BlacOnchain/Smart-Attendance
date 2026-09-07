@@ -49,6 +49,35 @@ class StudentController extends Controller
         return (stripos((string) $semester, 'Second') !== false) ? 'Second' : 'First';
     }
 
+    // Pulled out of profileView() so the method itself reads as
+    // "build the view data" rather than mixing that with a DB-writing
+    // loop. Behavior is unchanged, but updateOrCreate replaces the manual
+    // find-or-new-then-save, which is fewer lines and makes the intent
+    // (upsert one row per curriculum course) explicit.
+    //
+    // Worth flagging separately: this runs on every GET to the profile
+    // page, which means viewing your profile writes to the courses table
+    // every time. That's a pre-existing behavior, not something this
+    // refactor changes, but it's worth moving to a seeder/console command
+    // if course data only actually changes when the curriculum changes.
+    private function syncCurriculumCourses(array $curriculumCourses, string $level, string $semester): void
+    {
+        foreach ($curriculumCourses as $courseData) {
+            Course::updateOrCreate(
+                [
+                    'course_code' => $courseData['code'],
+                    'level' => $level,
+                    'semester' => $semester,
+                ],
+                [
+                    'course_title' => $courseData['title'],
+                    'department' => 'Computer Science',
+                    'units' => $courseData['units'] ?? 3,
+                ]
+            );
+        }
+    }
+
     /**
      * Student profile page.
      */
@@ -77,20 +106,7 @@ class StudentController extends Controller
         $levelData = $curriculum[$configLevelKey] ?? [];
         $curriculumCourses = $levelData['semesters'][$semesterKey] ?? [];
 
-        foreach ($curriculumCourses as $courseData) {
-            $course = Course::where('course_code', $courseData['code'])
-                ->where('level', $configLevelKey)
-                ->where('semester', $semesterKey)
-                ->first() ?? new Course();
-
-            $course->course_code = $courseData['code'];
-            $course->level = $configLevelKey;
-            $course->semester = $semesterKey;
-            $course->course_title = $courseData['title'];
-            $course->department = 'Computer Science';
-            $course->units = $courseData['units'] ?? 3;
-            $course->save();
-        }
+        $this->syncCurriculumCourses($curriculumCourses, $configLevelKey, $semesterKey);
 
         $courseCodes = collect($curriculumCourses)->pluck('code')->values()->all();
 

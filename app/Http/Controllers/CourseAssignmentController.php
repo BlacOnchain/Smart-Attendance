@@ -8,15 +8,18 @@ use Illuminate\Http\Request;
 
 class CourseAssignmentController extends Controller
 {
-    // Restricts this one utility page to specific accounts — not a new
-    // role or permission system, just an allowlist check.
-    private const ADMIN_EMAILS = [
-        'lecturer@smartattendance.test', // TODO: replace with your real admin email(s)
-    ];
-
+    // Previously this checked a hardcoded ADMIN_EMAILS array with a
+    // "TODO: replace with your real admin email(s)" comment. That's the
+    // kind of thing that gets forgotten in production and either locks
+    // everyone out or, worse, leaves a test email with real access.
+    //
+    // The User model already has an `is_hod` flag used elsewhere for the
+    // HOD view — course assignment is squarely an HOD responsibility, so
+    // we use that instead of maintaining a second, parallel permission
+    // list that can drift out of sync.
     private function ensureAdmin(): void
     {
-        if (!in_array(auth()->user()->email, self::ADMIN_EMAILS, true)) {
+        if (!auth()->check() || !auth()->user()->is_hod) {
             abort(403, 'Not authorized to manage course assignments.');
         }
     }

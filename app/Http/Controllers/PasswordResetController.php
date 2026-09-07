@@ -9,6 +9,16 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * NOTE: This duplicates AuthController's sendOtpCode / verifyOtpCode /
+ * resetPasswordWithOtp almost exactly, but stores the code in Cache
+ * instead of on the User model. Two parallel "forgot password" systems
+ * is a real risk: if both are wired into routes, they'll disagree on
+ * where the current code lives, and a code sent by one can never be
+ * verified by the other. Left as-is here since I can't see web.php or
+ * the auth views to know which one is actually in use, but this is
+ * worth resolving by picking one and deleting the other.
+ */
 class PasswordResetController extends Controller
 {
     // 1. Send 6-digit OTP code to email

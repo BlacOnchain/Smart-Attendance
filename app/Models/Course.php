@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Course extends Model
 {
-    protected $table = 'courses';
+    // $table removed — Laravel already infers 'courses' from the class
+    // name, so the explicit override was dead weight.
 
     protected $fillable = [
         'course_code',

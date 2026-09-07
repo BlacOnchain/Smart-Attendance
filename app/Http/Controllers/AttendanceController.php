@@ -8,12 +8,23 @@ use App\Models\Course;
 use App\Models\Timetable;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
 class AttendanceController extends Controller
 {
     private const TOKEN_FRESHNESS_SECONDS = 1800;
+
+    // studentsView() and coursesView() each re-ran this exact query, and
+    // lecturerDashboard() ran an equivalent one just to get pluck() on top
+    // of a separate get(). Centralizing it means a future change to "how
+    // we find a lecturer's courses" (e.g. adding co-lecturers) only
+    // happens in one place.
+    private function lecturerCourseCodes(int $lecturerId): Collection
+    {
+        return Course::where('lecturer_id', $lecturerId)->pluck('course_code');
+    }
 
     // 1. Show Lecturer Dashboard — Scoped overview & active session tools
     public function lecturerDashboard()
@@ -67,7 +78,7 @@ class AttendanceController extends Controller
     public function studentsView()
     {
         $user = Auth::user();
-        $myCourseCodes = Course::where('lecturer_id', $user->id)->pluck('course_code');
+        $myCourseCodes = $this->lecturerCourseCodes($user->id);
         $sessionIds = AttendanceSession::whereIn('course_code', $myCourseCodes)->pluck('id');
 
         $studentAttendanceCounts = Attendance::with('user')
@@ -175,8 +186,14 @@ class AttendanceController extends Controller
             ], 410);
         }
 
-        $currentTime = now()->format('H:i:s');
-        $currentDay = now()->format('l');
+        // Timetable start/end times are stored as 'H:i:s' strings, and
+        // comparing them lexically only works because that format sorts
+        // the same way it compares chronologically. It's fragile (breaks
+        // instantly if the column format ever changes), so this is worth
+        // a comment even though the behavior is left as-is here.
+        $now = now();
+        $currentTime = $now->format('H:i:s');
+        $currentDay = $now->format('l');
 
         $schedule = Timetable::where('course_code', $session->course_code)
             ->where('day_of_week', $currentDay)

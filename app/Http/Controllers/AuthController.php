@@ -7,6 +7,7 @@ use App\Mail\SendOtpMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
@@ -66,10 +67,10 @@ class AuthController extends Controller
         $request->validate(['email' => 'required|email|exists:users,email']);
 
         $user = User::where('email', $request->email)->first();
-        
+
         // Generate a random 6-digit code
-        $otp = rand(100000, 999999);
-        
+        $otp = (string) rand(100000, 999999);
+
         $user->otp_code = $otp;
         $user->otp_expires_at = Carbon::now()->addMinutes(10); // Code valid for 10 mins
         $user->save();
@@ -80,9 +81,15 @@ class AuthController extends Controller
 
             return response()->json(['success' => true, 'message' => 'Verification code sent to your Gmail!']);
         } catch (\Exception $e) {
+            // Previously this returned $e->getMessage() straight to the
+            // client, which can leak mail server hostnames, credentials
+            // in transport errors, or stack details. Log it server-side
+            // and keep the client message generic instead.
+            Log::error('OTP mail send failed for ' . $user->email . ': ' . $e->getMessage());
+
             return response()->json([
-                'success' => false, 
-                'message' => 'Mail Error: ' . $e->getMessage()
+                'success' => false,
+                'message' => 'We could not send the verification email right now. Please try again shortly.',
             ], 500);
         }
     }
@@ -97,7 +104,12 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || $user->otp_code !== $request->otp_code) {
+        // otp_code is generated as a string above, but comparing with !==
+        // is still fragile if it's ever stored/cast as an integer (e.g. by
+        // a future migration change). hash_equals is both type-safe and
+        // timing-attack resistant, which matters for a value guarding
+        // password reset.
+        if (!$user || !$user->otp_code || !hash_equals((string) $user->otp_code, (string) $request->otp_code)) {
             return response()->json(['success' => false, 'message' => 'Invalid verification code.'], 422);
         }
 
@@ -119,7 +131,12 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || $user->otp_code !== $request->otp_code || Carbon::now()->greaterThan($user->otp_expires_at)) {
+        $validOtp = $user
+            && $user->otp_code
+            && hash_equals((string) $user->otp_code, (string) $request->otp_code)
+            && Carbon::now()->lessThan($user->otp_expires_at);
+
+        if (!$validOtp) {
             return response()->json(['success' => false, 'message' => 'Invalid or expired session. Please start over.'], 422);
         }
 
