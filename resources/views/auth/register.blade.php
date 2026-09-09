@@ -119,7 +119,29 @@
         .anim-scale        { animation: scaleIn .6s cubic-bezier(.16,1,.3,1) both; animation-delay: var(--d,0s); }
         .anim-slide-right { animation: slideRightIn .6s cubic-bezier(.16,1,.3,1) both; animation-delay: var(--d,0s); }
 
+        @keyframes floatBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .float-bob {
+            animation: floatBob 5s ease-in-out infinite;
+        }
+        .step-row {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .step-row .step-num {
+            display: flex; align-items: center; justify-content: center;
+            width: 26px; height: 26px; border-radius: 999px;
+            background: var(--brand); color: #fff;
+            font-size: 11px; font-weight: 700; flex-shrink: 0;
+        }
+        .step-row .step-label {
+            font-size: 13.5px; font-weight: 500; color: #5b6660;
+        }
+        .step-row .step-arrow { color: #c8cec3; font-size: 13px; }
+
         @media (prefers-reduced-motion: reduce) {
+            .float-bob { animation: none !important; }
             .auth-mesh { animation: none !important; }
             .anim-rise, .anim-scale, .anim-slide-right { animation: none !important; opacity: 1 !important; transform: none !important; }
             .lift-hover, .btn-nudge { transition: none !important; }
@@ -131,7 +153,7 @@
         <div class="auth-mesh"></div>
         <div class="grain"></div>
 
-        <div class="relative z-10 grid min-h-screen lg:grid-cols-2">
+        <div class="relative z-10 mx-auto grid min-h-screen max-w-7xl lg:grid-cols-2">
             <!-- Register panel -->
             <section class="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-12" style="padding-top: max(2.5rem, env(safe-area-inset-top)); padding-bottom: max(2.5rem, env(safe-area-inset-bottom));">
                 <div class="w-full max-w-md">
@@ -244,6 +266,13 @@
                     <p class="mt-5 text-lg leading-8" style="color:#4b564f">
                         Build your profile, pick your level and semester, and register the courses you're actually taking this term.
                     </p>
+                    <div class="step-row anim-slide-right mt-6" style="--d: 0.14s">
+                        <span class="step-num">1</span><span class="step-label">Setup</span>
+                        <span class="step-arrow">→</span>
+                        <span class="step-num">2</span><span class="step-label">Pick courses</span>
+                        <span class="step-arrow">→</span>
+                        <span class="step-num">3</span><span class="step-label">Start scanning</span>
+                    </div>
                 </div>
 
                 <div class="anim-scale glass-panel rounded-2xl p-5 flex items-center gap-3 max-w-sm" style="--d: 0.16s">
@@ -257,17 +286,17 @@
 
                 <div class="anim-slide-right grid gap-4 sm:grid-cols-3" style="--d: 0.24s">
                     <div class="glass-chip lift-hover rounded-2xl p-5">
-                        <div class="chip-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></div>
+                        <div class="chip-icon float-bob" style="animation-delay: 0s"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></div>
                         <p class="text-sm" style="color:#5b6660">Profile</p>
                         <p class="mt-1 text-xl font-semibold">Setup</p>
                     </div>
                     <div class="glass-chip lift-hover rounded-2xl p-5">
-                        <div class="chip-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></div>
+                        <div class="chip-icon float-bob" style="animation-delay: 0.6s"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></div>
                         <p class="text-sm" style="color:#5b6660">Level</p>
                         <p class="mt-1 text-xl font-semibold">ND / HND</p>
                     </div>
                     <div class="glass-chip lift-hover rounded-2xl p-5">
-                        <div class="chip-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M4 9.5h16M9 4v4.5"/></svg></div>
+                        <div class="chip-icon float-bob" style="animation-delay: 1.2s"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M4 9.5h16M9 4v4.5"/></svg></div>
                         <p class="text-sm" style="color:#5b6660">Timetable</p>
                         <p class="mt-1 text-xl font-semibold">Courses</p>
                     </div>
