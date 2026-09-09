@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Lecturer Sign In | Smart Attendance</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +19,7 @@
         }
         * { font-family: 'IBM Plex Sans', system-ui, sans-serif; }
         .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
-        body { background: linear-gradient(160deg, #e9f4ec 0%, #f6f8f2 48%, #eef6f1 100%); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
+        body { background: linear-gradient(160deg, #e9f4f2 0%, #f6f8f2 30%, #fbfbf7 55%, #eef6f4 100%); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
 
         .auth-mesh {
             position: absolute; inset: 0;
@@ -119,10 +120,68 @@
         .anim-scale        { animation: scaleIn .6s cubic-bezier(.16,1,.3,1) both; animation-delay: var(--d,0s); }
         .anim-slide-right { animation: slideRightIn .6s cubic-bezier(.16,1,.3,1) both; animation-delay: var(--d,0s); }
 
+        @keyframes scaleUp {
+            0% { opacity: 0; transform: scale(0.94); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-scale-up { animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
         @media (prefers-reduced-motion: reduce) {
             .auth-mesh { animation: none !important; }
             .anim-rise, .anim-scale, .anim-slide-right { animation: none !important; opacity: 1 !important; transform: none !important; }
             .lift-hover, .btn-nudge { transition: none !important; }
+        }
+
+        /* OTP slots + orbit collapse, teal-tinted for the lecturer portal */
+        .otp-slot {
+            width: 44px; height: 54px; border-radius: 14px;
+            background: rgba(255,255,255,0.75);
+            border: 1px solid var(--line);
+            color: var(--ink);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 20px; font-weight: 700; text-align: center;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+        .otp-slot:focus {
+            border-color: rgba(13,148,136,0.6);
+            box-shadow: 0 0 0 4px rgba(13,148,136,0.14);
+        }
+        .otp-slot.filled {
+            border-color: rgba(13,148,136,0.5);
+            background: rgba(13,148,136,0.08);
+        }
+        .otp-slot.error {
+            border-color: rgba(190,18,60,0.7);
+            animation: otpShake 0.4s ease;
+        }
+        @keyframes otpShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        .orbit {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: none;
+        }
+        .orbit-ring {
+            width: 110px; height: 110px;
+            fill: none;
+            stroke: rgba(13,148,136,0.45);
+            stroke-width: 1.5;
+            stroke-dasharray: 2 6;
+            animation: orbitSpin 2.4s linear infinite;
+        }
+        @keyframes orbitSpin { to { transform: rotate(360deg); } }
+        .orbit_hub {
+            position: absolute;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: var(--brand);
+            box-shadow: 0 0 18px 4px rgba(13,148,136,0.45);
         }
     </style>
 </head>
@@ -162,7 +221,7 @@
                                 <label class="field-label">Email address</label>
                                 <div class="relative">
                                     <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5L12 13l8.5-6.5"/></svg>
-                                    <input type="email" name="email" value="{{ old('email') }}" required placeholder="you@example.com"
+                                    <input type="email" name="email" id="emailInput" value="{{ old('email') }}" required placeholder="you@example.com"
                                            class="glass-input w-full rounded-2xl pl-11 pr-4 py-3">
                                 </div>
                             </div>
@@ -180,6 +239,10 @@
                                         </svg>
                                     </button>
                                 </div>
+                            </div>
+
+                            <div class="flex justify-end text-sm pt-1">
+                                <button type="button" onclick="openForgotModal()" class="font-medium bg-transparent border-none cursor-pointer" style="color: var(--brand-dark)">Forgot password?</button>
                             </div>
 
                             <button type="submit" class="btn-nudge mt-2 w-full rounded-2xl px-4 py-3.5 font-semibold text-white shadow-lg transition" style="background: var(--brand); box-shadow: 0 10px 25px -8px rgba(13,148,136,0.4);" onmouseover="this.style.background='var(--brand-dark)'" onmouseout="this.style.background='var(--brand)'">
@@ -233,12 +296,344 @@
                 </div>
             </aside>
         </div>
+
+        <!-- FORGOT PASSWORD MODAL OVERLAY -->
+        <div id="forgotModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4" style="background: rgba(16,32,26,0.45); backdrop-filter: blur(6px);">
+            <div class="w-full max-w-md rounded-[32px] p-8 shadow-2xl animate-scale-up" style="background: #ffffff; border: 1px solid var(--line); color: var(--ink);">
+
+                <!-- Step 1: Enter Email -->
+                <div id="forgotStep1">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold">Reset password</h3>
+                        <button onclick="closeForgotModal()" class="text-lg font-bold" style="color:#9aa39c">✕</button>
+                    </div>
+                    <p class="text-sm mb-6" style="color:#5b6660">Enter your registered lecturer email address and we'll send you a 6-digit verification code.</p>
+
+                    <div id="step1Error" class="hidden mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700"></div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="field-label">Email address</label>
+                            <input type="email" id="resetEmail" required placeholder="you@example.com" class="glass-input w-full rounded-2xl px-4 py-3">
+                        </div>
+                        <button type="button" onclick="sendOtpRequest()" id="sendOtpBtn" class="w-full rounded-2xl px-4 py-3.5 font-semibold text-white transition" style="background: var(--brand)" onmouseover="this.style.background='var(--brand-dark)'" onmouseout="this.style.background='var(--brand)'">
+                            Send verification code
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Enter OTP Code — 6 slots with orbit collapse verification animation -->
+                <div id="forgotStep2" class="hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-2xl font-bold">Enter verification code</h3>
+                        <button onclick="closeForgotModal()" class="text-lg font-bold" style="color:#9aa39c">✕</button>
+                    </div>
+                    <p class="text-sm mb-5" style="color:#5b6660">Enter the 6-digit code sent to your email inbox.</p>
+
+                    <div id="step2Error" class="hidden mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700 text-left"></div>
+
+                    <div class="relative flex items-center justify-center py-6" style="min-height: 90px;">
+                        <div id="otpSlotRow" class="flex items-center justify-center gap-2.5">
+                            <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="0" autocomplete="one-time-code">
+                            <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="1">
+                            <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="2">
+                            <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="3">
+                            <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="4">
+                            <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="5">
+                        </div>
+
+                        <div class="orbit hidden" id="otpOrbit">
+                            <svg class="orbit-ring" viewBox="0 0 110 110">
+                                <circle cx="55" cy="55" r="46" vector-effect="non-scaling-stroke" />
+                            </svg>
+                            <span class="orbit_hub" id="orbitHub"></span>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="resetOtp">
+                </div>
+
+                <!-- Step 3: New Password Input -->
+                <div id="forgotStep3" class="hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold">New password</h3>
+                        <button onclick="closeForgotModal()" class="text-lg font-bold" style="color:#9aa39c">✕</button>
+                    </div>
+                    <p class="text-sm mb-6" style="color:#5b6660">Create a secure new password for your lecturer account.</p>
+
+                    <div id="step3Error" class="hidden mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700"></div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="field-label">New password</label>
+                            <input type="password" id="newPassword" required placeholder="••••••••" class="glass-input w-full rounded-2xl px-4 py-3">
+                        </div>
+                        <div>
+                            <label class="field-label">Confirm new password</label>
+                            <input type="password" id="newPasswordConfirmation" required placeholder="••••••••" class="glass-input w-full rounded-2xl px-4 py-3">
+                        </div>
+                        <button type="button" onclick="resetPasswordRequest()" id="resetPassBtn" class="w-full rounded-2xl px-4 py-3.5 font-semibold text-white transition" style="background: var(--brand)" onmouseover="this.style.background='var(--brand-dark)'" onmouseout="this.style.background='var(--brand)'">
+                            Update password
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Success Confirmation -->
+                <div id="forgotStep4" class="hidden text-center py-6">
+                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border text-3xl mb-4" style="background: rgba(13,148,136,0.1); color: var(--brand); border-color: rgba(13,148,136,0.25)">
+                        ✓
+                    </div>
+                    <h3 class="text-2xl font-bold">Password updated</h3>
+                    <p class="mt-2 text-sm" style="color:#5b6660">Your password has been changed successfully. Redirecting you...</p>
+                </div>
+
+            </div>
+        </div>
     </div>
 
     <script>
         function togglePassword() {
             const input = document.getElementById('passwordInput');
             input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function openForgotModal() {
+            document.getElementById('forgotModal').classList.remove('hidden');
+            document.getElementById('forgotModal').classList.add('flex');
+        }
+
+        function closeForgotModal() {
+            document.getElementById('forgotModal').classList.add('hidden');
+            document.getElementById('forgotModal').classList.remove('flex');
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+        async function sendOtpRequest() {
+            const email = document.getElementById('resetEmail').value;
+            const errorBox = document.getElementById('step1Error');
+            errorBox.classList.add('hidden');
+
+            if (!email) {
+                errorBox.textContent = 'Please enter your email address.';
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const response = await fetch("{{ route('password.otp.send') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('forgotStep1').classList.add('hidden');
+                    document.getElementById('forgotStep2').classList.remove('hidden');
+                    if (window.resetOtpSlots) resetOtpSlots();
+                } else {
+                    errorBox.textContent = data.message || 'Unable to send code. Check email address.';
+                    errorBox.classList.remove('hidden');
+                }
+            } catch (e) {
+                errorBox.textContent = 'Connection error. Please try again.';
+                errorBox.classList.remove('hidden');
+            }
+        }
+
+        // --- OTP slot input + orbit collapse animation ---
+        (function () {
+            const slots = Array.from(document.querySelectorAll('.otp-slot'));
+            const hiddenOtp = document.getElementById('resetOtp');
+            const slotRow = document.getElementById('otpSlotRow');
+            const orbit = document.getElementById('otpOrbit');
+
+            function syncHidden() {
+                hiddenOtp.value = slots.map(s => s.value).join('');
+            }
+
+            slots.forEach((slot, i) => {
+                slot.addEventListener('input', () => {
+                    slot.value = slot.value.replace(/[^0-9]/g, '').slice(0, 1);
+                    slot.classList.toggle('filled', slot.value !== '');
+                    syncHidden();
+
+                    if (slot.value && i < slots.length - 1) {
+                        slots[i + 1].focus();
+                    }
+
+                    if (slots.every(s => s.value !== '')) {
+                        playOrbitCollapse();
+                    }
+                });
+
+                slot.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !slot.value && i > 0) {
+                        slots[i - 1].focus();
+                    }
+                });
+
+                slot.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+                    pasted.split('').forEach((digit, idx) => {
+                        if (slots[idx]) {
+                            slots[idx].value = digit;
+                            slots[idx].classList.add('filled');
+                        }
+                    });
+                    syncHidden();
+                    if (pasted.length === 6) {
+                        playOrbitCollapse();
+                    } else if (slots[pasted.length]) {
+                        slots[pasted.length].focus();
+                    }
+                });
+            });
+
+            function playOrbitCollapse() {
+                const hub = document.getElementById('orbitHub');
+                orbit.classList.remove('hidden');
+
+                const hRect = hub.getBoundingClientRect();
+                const centerX = hRect.left + hRect.width / 2;
+                const centerY = hRect.top + hRect.height / 2;
+
+                slots.forEach((slot, i) => {
+                    const rect = slot.getBoundingClientRect();
+                    const dx = centerX - (rect.left + rect.width / 2);
+                    const dy = centerY - (rect.top + rect.height / 2);
+
+                    slot.animate([
+                        { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
+                        { transform: `translate(${dx * 0.6}px, ${dy * 0.6}px) rotate(220deg)`, opacity: 0.7, offset: 0.6 },
+                        { transform: `translate(${dx}px, ${dy}px) rotate(450deg)`, opacity: 0 },
+                    ], {
+                        duration: 550,
+                        delay: i * 40,
+                        easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
+                        fill: 'forwards',
+                    });
+                });
+
+                setTimeout(() => { slotRow.style.visibility = 'hidden'; }, 550 + slots.length * 40);
+                setTimeout(() => { verifyOtpRequest(); }, 700 + slots.length * 40);
+            }
+
+            window.resetOtpSlots = function () {
+                slots.forEach(s => {
+                    s.getAnimations().forEach(a => a.cancel());
+                    s.value = '';
+                    s.classList.remove('filled', 'error');
+                });
+                slotRow.style.visibility = 'visible';
+                orbit.classList.add('hidden');
+                syncHidden();
+                slots[0].focus();
+            };
+
+            window.markOtpError = function () {
+                slotRow.style.visibility = 'visible';
+                orbit.classList.add('hidden');
+                slots.forEach(s => {
+                    s.getAnimations().forEach(a => a.cancel());
+                    s.classList.add('error');
+                });
+                setTimeout(() => slots.forEach(s => s.classList.remove('error')), 400);
+            };
+        })();
+
+        async function verifyOtpRequest() {
+            const email = document.getElementById('resetEmail').value;
+            const otp_code = document.getElementById('resetOtp').value;
+            const errorBox = document.getElementById('step2Error');
+            errorBox.classList.add('hidden');
+
+            if (!otp_code || otp_code.length !== 6) {
+                errorBox.textContent = 'Please enter the valid 6-digit code.';
+                errorBox.classList.remove('hidden');
+                if (window.markOtpError) markOtpError();
+                return;
+            }
+
+            try {
+                const response = await fetch("{{ route('password.otp.verify') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, otp_code })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('forgotStep2').classList.add('hidden');
+                    document.getElementById('forgotStep3').classList.remove('hidden');
+                } else {
+                    errorBox.textContent = data.message || 'Invalid or expired verification code.';
+                    errorBox.classList.remove('hidden');
+                    if (window.markOtpError) markOtpError();
+                }
+            } catch (e) {
+                errorBox.textContent = 'Connection error. Please try again.';
+                errorBox.classList.add('hidden');
+                if (window.markOtpError) markOtpError();
+            }
+        }
+
+        async function resetPasswordRequest() {
+            const email = document.getElementById('resetEmail').value;
+            const otp_code = document.getElementById('resetOtp').value;
+            const password = document.getElementById('newPassword').value;
+            const password_confirmation = document.getElementById('newPasswordConfirmation').value;
+            const errorBox = document.getElementById('step3Error');
+            errorBox.classList.add('hidden');
+
+            if (!password || password.length < 8) {
+                errorBox.textContent = 'Password must be at least 8 characters long.';
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            if (password !== password_confirmation) {
+                errorBox.textContent = 'Passwords do not match.';
+                errorBox.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const response = await fetch("{{ route('password.otp.reset') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, otp_code, password, password_confirmation })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('forgotStep3').classList.add('hidden');
+                    document.getElementById('forgotStep4').classList.remove('hidden');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    errorBox.textContent = data.message || 'Failed to reset password.';
+                    errorBox.classList.add('hidden');
+                }
+            } catch (e) {
+                errorBox.textContent = 'Connection error. Please try again.';
+                errorBox.classList.add('hidden');
+            }
         }
     </script>
 </body>

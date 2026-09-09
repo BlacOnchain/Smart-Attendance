@@ -6,10 +6,13 @@
     <title>Attendance Check-in | Smart Attendance</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            overflow-x: hidden;
-        }
+        * { font-family: 'IBM Plex Sans', system-ui, sans-serif; }
+        .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+        body { overflow-x: hidden; }
         @keyframes scaleUp {
             0% { opacity: 0; transform: scale(0.85); }
             100% { opacity: 1; transform: scale(1); }
@@ -49,7 +52,7 @@
                         </svg>
                     </div>
                     <h2 class="text-2xl font-bold text-white">Recording Attendance</h2>
-                    <p class="mt-2 text-sm text-slate-400">Course: <span class="font-semibold text-slate-200">{{ $session->course_code }}</span></p>
+                    <p class="mt-2 text-sm text-slate-400">Course: <span class="mono font-semibold text-emerald-300">{{ $session->course_code }}</span></p>
                     <p class="mt-3 text-sm text-slate-400">Verifying secure session...</p>
                 </div>
 
@@ -60,7 +63,7 @@
                     </div>
                     <h2 id="resultTitle" class="text-2xl font-bold text-white"></h2>
                     <p class="mt-3 text-sm leading-relaxed text-slate-300" id="resultMessage"></p>
-                    <p class="mt-6 text-xs text-slate-500">Redirecting to your dashboard shortly...</p>
+                    <p class="mt-6 text-xs mono text-slate-500">Redirecting to your dashboard shortly...</p>
                 </div>
             @endif
 

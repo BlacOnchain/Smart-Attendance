@@ -69,7 +69,7 @@ Route::post('/login', function (Request $request) {
     return back()->withErrors([
         'email' => 'The provided credentials do not match our records.',
     ])->onlyInput('email');
-})->name('login.submit');
+})->middleware('throttle:5,1')->name('login.submit');
 
 Route::post('/lecturer/login', function (Request $request) {
     $credentials = $request->validate([
@@ -120,15 +120,21 @@ Route::post('/lecturer/login', function (Request $request) {
     return back()->withErrors([
         'email' => 'The provided credentials do not match our records.',
     ])->onlyInput('email');
-})->name('lecturer.login.submit');
+})->middleware('throttle:5,1')->name('lecturer.login.submit');
 
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 
 // --- OTP Forgot Password Routes ---
-Route::post('/password/otp/send', [AuthController::class, 'sendOtpCode'])->name('password.otp.send');
-Route::post('/password/otp/verify', [AuthController::class, 'verifyOtpCode'])->name('password.otp.verify');
-Route::post('/password/otp/reset', [AuthController::class, 'resetPasswordWithOtp'])->name('password.otp.reset');
+// Shared by both student and lecturer login pages - AuthController's OTP
+// methods look up by email only, with no role restriction, so no
+// duplicate routes are needed per role.
+Route::post('/password/otp/send', [AuthController::class, 'sendOtpCode'])
+    ->middleware('throttle:3,1')->name('password.otp.send');
+Route::post('/password/otp/verify', [AuthController::class, 'verifyOtpCode'])
+    ->middleware('throttle:5,1')->name('password.otp.verify');
+Route::post('/password/otp/reset', [AuthController::class, 'resetPasswordWithOtp'])
+    ->middleware('throttle:5,1')->name('password.otp.reset');
 
 Route::post('/logout', function (Request $request) {
     Auth::logout();

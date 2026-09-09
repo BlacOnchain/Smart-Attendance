@@ -5,28 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Course Registration Form - {{ $user->name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --ink: #10201a;
+            --line: #e4e6df;
+            --brand: #059669;
+            --brand-dark: #047857;
+        }
+        * { font-family: 'IBM Plex Sans', system-ui, sans-serif; }
+        .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+
+        /* Print-safe by design: no backdrop-filter, no box-shadow-heavy glass,
+           no animation. Those either vanish or render incorrectly on paper. */
         @media print {
-            body { print-color-adjust: exact; }
+            body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
             .no-print { display: none !important; }
         }
-        body { overflow-x: hidden; }
+        body { overflow-x: hidden; background: #fbfbf7; color: var(--ink); }
         a, button {
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen py-6 px-3 text-slate-900 sm:py-10 sm:px-4">
-    <div class="mx-auto max-w-3xl bg-white rounded-3xl border border-emerald-200 shadow-xl p-5 sm:p-8 md:p-12">
+<body class="min-h-screen py-6 px-3 sm:py-10 sm:px-4">
+    <div class="mx-auto max-w-3xl bg-white rounded-3xl shadow-xl p-5 sm:p-8 md:p-12" style="border: 1px solid var(--line)">
 
         <!-- School Header -->
-        <div class="flex flex-col gap-4 border-b border-emerald-100 pb-6 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between" style="border-color: var(--line)">
             <div>
-                <h1 class="text-xs font-bold uppercase tracking-[0.3em] text-emerald-700">Smart Attendance University</h1>
-                <h2 class="text-lg font-extrabold text-slate-900 sm:text-xl">Official Course Registration Form</h2>
+                <h1 class="mono text-xs font-bold" style="color: var(--brand-dark)">SMART ATTENDANCE UNIVERSITY</h1>
+                <h2 class="text-lg font-bold sm:text-xl" style="color: var(--ink)">Official Course Registration Form</h2>
             </div>
-            <button onclick="window.print()" class="no-print w-full rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-emerald-700 sm:w-auto">
+            <button onclick="window.print()" class="no-print w-full rounded-2xl px-5 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-90 sm:w-auto" style="background: var(--brand)">
                 Print / Download PDF
             </button>
         </div>
@@ -39,38 +53,36 @@
         @endphp
 
         <!-- Student Bio Grid with Profile Picture -->
-        <div class="mt-8 flex flex-col sm:flex-row items-center gap-6 rounded-2xl border border-emerald-100 bg-emerald-50/30 p-5 sm:p-6">
-            <img src="{{ $photoUrl }}" alt="Student Photo" class="h-24 w-24 shrink-0 rounded-2xl object-cover border-2 border-emerald-600 shadow-sm">
+        <div class="mt-8 flex flex-col sm:flex-row items-center gap-6 rounded-2xl p-5 sm:p-6" style="background: rgba(5,150,105,0.05); border: 1px solid rgba(5,150,105,0.16)">
+            <img src="{{ $photoUrl }}" alt="Student Photo" class="h-24 w-24 shrink-0 rounded-2xl object-cover border-2 shadow-sm" style="border-color: var(--brand)">
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full text-sm min-w-0">
                 <div class="min-w-0">
-                    <p class="text-xs uppercase tracking-wider text-slate-500 font-bold">Student Name</p>
-                    <p class="truncate font-bold text-slate-900 text-base mt-0.5">{{ $user->name }}</p>
+                    <p class="mono text-xs" style="color: #7a8580">Student name</p>
+                    <p class="truncate font-bold text-base mt-0.5" style="color: var(--ink)">{{ $user->name }}</p>
                 </div>
                 <div class="min-w-0">
-                    <p class="text-xs uppercase tracking-wider text-slate-500 font-bold">Matric Number</p>
-                    <p class="truncate font-bold text-slate-900 text-base mt-0.5">{{ $user->matric_number ?? 'Not Set' }}</p>
+                    <p class="mono text-xs" style="color: #7a8580">Matric number</p>
+                    <p class="truncate font-bold text-base mt-0.5" style="color: var(--ink)">{{ $user->matric_number ?? 'Not Set' }}</p>
                 </div>
                 <div class="min-w-0">
-                    <p class="text-xs uppercase tracking-wider text-slate-500 font-bold">Department</p>
-                    <p class="truncate font-bold text-slate-900 text-base mt-0.5">{{ $user->department ?? 'Not Set' }}</p>
+                    <p class="mono text-xs" style="color: #7a8580">Department</p>
+                    <p class="truncate font-bold text-base mt-0.5" style="color: var(--ink)">{{ $user->department ?? 'Not Set' }}</p>
                 </div>
                 <div class="min-w-0">
-                    <p class="text-xs uppercase tracking-wider text-slate-500 font-bold">Level & Semester</p>
-                    <p class="truncate font-bold text-emerald-700 text-base mt-0.5">{{ $levelLabel ?? 'N/A' }} &bull; {{ $selectedSemester }} Semester</p>
+                    <p class="mono text-xs" style="color: #7a8580">Level & semester</p>
+                    <p class="truncate font-bold text-base mt-0.5" style="color: var(--brand-dark)">{{ $levelLabel ?? 'N/A' }} &bull; {{ $selectedSemester }} Semester</p>
                 </div>
             </div>
         </div>
 
         <!-- Enrolled Courses Table -->
         <div class="mt-8">
-            <h3 class="text-sm font-bold uppercase tracking-[0.2em] text-emerald-700 mb-4">Registered Courses</h3>
+            <h3 class="mono text-sm font-bold mb-4" style="color: var(--brand-dark)">Registered courses</h3>
 
-            <!-- Horizontal scroll only kicks in on screens too narrow for
-                 four columns; nothing squeezes or wraps awkwardly. -->
-            <div class="overflow-x-auto rounded-2xl border border-emerald-100 -mx-1 px-1 sm:mx-0 sm:px-0">
+            <div class="overflow-x-auto rounded-2xl -mx-1 px-1 sm:mx-0 sm:px-0" style="border: 1px solid var(--line)">
                 <table class="w-full min-w-[480px] text-left text-sm">
-                    <thead class="bg-emerald-600 text-white font-bold">
+                    <thead class="text-white font-bold" style="background: var(--brand)">
                         <tr>
                             <th class="px-4 py-3 sm:px-5 sm:py-3.5">S/N</th>
                             <th class="px-4 py-3 sm:px-5 sm:py-3.5">Course Code</th>
@@ -78,26 +90,26 @@
                             <th class="px-4 py-3 text-center sm:px-5 sm:py-3.5">Units</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-emerald-50 bg-white">
+                    <tbody class="divide-y bg-white" style="border-color: var(--line)">
                         @php $totalUnits = 0; @endphp
                         @forelse ($enrolledCourses as $index => $course)
                             @php $totalUnits += ($course->units ?? 3); @endphp
-                            <tr class="hover:bg-slate-50">
-                                <td class="px-4 py-3.5 font-semibold text-slate-500 sm:px-5 sm:py-4">{{ $index + 1 }}</td>
-                                <td class="px-4 py-3.5 font-bold text-slate-900 sm:px-5 sm:py-4">{{ $course->course_code }}</td>
-                                <td class="px-4 py-3.5 font-medium text-slate-700 sm:px-5 sm:py-4">{{ $course->course_title }}</td>
-                                <td class="px-4 py-3.5 text-center font-bold text-emerald-700 sm:px-5 sm:py-4">{{ $course->units ?? 3 }}</td>
+                            <tr>
+                                <td class="px-4 py-3.5 font-semibold sm:px-5 sm:py-4" style="color: #9aa39c">{{ $index + 1 }}</td>
+                                <td class="px-4 py-3.5 font-bold sm:px-5 sm:py-4" style="color: var(--ink)">{{ $course->course_code }}</td>
+                                <td class="px-4 py-3.5 font-medium sm:px-5 sm:py-4" style="color: #5b6660">{{ $course->course_title }}</td>
+                                <td class="px-4 py-3.5 text-center font-bold sm:px-5 sm:py-4" style="color: var(--brand-dark)">{{ $course->units ?? 3 }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-5 py-6 text-center text-slate-500 font-semibold">No courses registered yet. Please select courses on your profile page.</td>
+                                <td colspan="4" class="px-5 py-6 text-center font-semibold" style="color: #9aa39c">No courses registered yet. Please select courses on your profile page.</td>
                             </tr>
                         @endforelse
                     </tbody>
-                    <tfoot class="bg-emerald-50/60 font-bold text-slate-900 border-t border-emerald-100">
+                    <tfoot class="font-bold border-t" style="background: rgba(5,150,105,0.08); border-color: var(--line); color: var(--ink)">
                         <tr>
-                            <td colspan="3" class="px-4 py-3.5 text-right uppercase tracking-wider text-xs text-emerald-800 sm:px-5">Total Units Registered:</td>
-                            <td class="px-4 py-3.5 text-center text-emerald-800 text-base sm:px-5">{{ $totalUnits }}</td>
+                            <td colspan="3" class="mono px-4 py-3.5 text-right text-xs sm:px-5" style="color: var(--brand-dark)">Total units registered:</td>
+                            <td class="px-4 py-3.5 text-center text-base sm:px-5" style="color: var(--brand-dark)">{{ $totalUnits }}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -106,17 +118,17 @@
 
         <!-- Signatures Section -->
         <div class="mt-14 grid grid-cols-1 gap-8 text-sm sm:mt-16 sm:grid-cols-2">
-            <div class="border-t border-slate-300 pt-3">
-                <p class="font-bold text-slate-800">Student's Signature & Date</p>
+            <div class="border-t pt-3" style="border-color: #cbd0c6">
+                <p class="font-bold" style="color: var(--ink)">Student's Signature & Date</p>
             </div>
-            <div class="border-t border-slate-300 pt-3">
-                <p class="font-bold text-slate-800">HOD / Level Coordinator Signature</p>
+            <div class="border-t pt-3" style="border-color: #cbd0c6">
+                <p class="font-bold" style="color: var(--ink)">HOD / Level Coordinator Signature</p>
             </div>
         </div>
 
         <!-- Back Button -->
         <div class="mt-10 text-center no-print">
-            <a href="{{ route('student.profile') }}" class="inline-flex items-center justify-center rounded-2xl border border-emerald-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-emerald-50 transition shadow-sm">
+            <a href="{{ route('student.profile') }}" class="inline-flex items-center justify-center rounded-2xl px-6 py-3 text-sm font-semibold transition shadow-sm" style="border: 1px solid var(--line); background: white; color: var(--ink)">
                 &larr; Back to Profile
             </a>
         </div>

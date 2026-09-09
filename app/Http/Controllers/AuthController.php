@@ -13,26 +13,6 @@ use Carbon\Carbon;
 
 class AuthController extends Controller
 {
-    public function showLogin() {
-        return view('auth.login');
-    }
-
-    public function login(Request $request) {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect('/student/dashboard');
-        }
-
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
-    }
-
     public function showRegister() {
         return view('auth.register');
     }
@@ -60,6 +40,10 @@ class AuthController extends Controller
     }
 
     // --- OTP Forgot Password Methods ---
+    // Role-agnostic by design: looks up whichever user owns the email
+    // address, regardless of whether they're a student or lecturer. This
+    // is what already lets the student login page's forgot-password flow
+    // work, and it's exactly what the lecturer login page will call too.
 
     // 1. Send OTP Code to Email
     public function sendOtpCode(Request $request)
@@ -79,7 +63,7 @@ class AuthController extends Controller
             // Send the styled HTML email using our Mailable class
             Mail::to($user->email)->send(new SendOtpMail($otp));
 
-            return response()->json(['success' => true, 'message' => 'Verification code sent to your Gmail!']);
+            return response()->json(['success' => true, 'message' => 'Verification code sent to your email!']);
         } catch (\Exception $e) {
             // Previously this returned $e->getMessage() straight to the
             // client, which can leak mail server hostnames, credentials
@@ -147,14 +131,5 @@ class AuthController extends Controller
         $user->save();
 
         return response()->json(['success' => true, 'message' => 'Password changed successfully! Redirecting...']);
-    }
-
-    // Logout functionality
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/login');
     }
 }
