@@ -126,6 +126,11 @@
         .float-bob {
             animation: floatBob 5s ease-in-out infinite;
         }
+        .password-meter {
+            height: 4px; border-radius: 999px; background: #e4e6df; overflow: hidden;
+        }
+        .password-meter span { display: block; height: 100%; width: 0; border-radius: inherit; transition: width .25s ease, background-color .25s ease; }
+        .password-hint { font-size: 11px; color: #7a8580; }
         .step-row {
             display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
         }
@@ -178,42 +183,42 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('register.submit') }}" method="POST" class="mt-7 space-y-4">
+                        <form id="registerForm" action="{{ route('register.submit') }}" method="POST" class="mt-7 space-y-4">
                             @csrf
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label class="field-label">First name</label>
-                                    <input type="text" name="first_name" value="{{ old('first_name') }}" required placeholder="Ada"
+                                    <label class="field-label" for="firstNameInput">First name</label>
+                                    <input type="text" id="firstNameInput" name="first_name" value="{{ old('first_name') }}" required placeholder="Ada"
                                            class="glass-input w-full rounded-2xl px-4 py-3">
                                 </div>
                                 <div>
-                                    <label class="field-label">Last name</label>
-                                    <input type="text" name="last_name" value="{{ old('last_name') }}" required placeholder="Lovelace"
+                                    <label class="field-label" for="lastNameInput">Last name</label>
+                                    <input type="text" id="lastNameInput" name="last_name" value="{{ old('last_name') }}" required placeholder="Lovelace"
                                            class="glass-input w-full rounded-2xl px-4 py-3">
                                 </div>
                             </div>
 
                             <div>
-                                <label class="field-label">Email address</label>
+                                <label class="field-label" for="emailInput">Email address</label>
                                 <div class="relative">
                                     <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5L12 13l8.5-6.5"/></svg>
-                                    <input type="email" name="email" value="{{ old('email') }}" required placeholder="you@example.com"
+                                    <input type="email" id="emailInput" name="email" value="{{ old('email') }}" required placeholder="you@example.com"
                                            class="glass-input w-full rounded-2xl pl-11 pr-4 py-3">
                                 </div>
                             </div>
 
                             <div>
-                                <label class="field-label">Phone number</label>
+                                <label class="field-label" for="phoneInput">Phone number</label>
                                 <div class="relative">
                                     <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5c1 2 1.7 3.4 2.5 4.3-.8 1-1.5 1.6-2 2 1 2.4 2.3 3.7 4.7 4.7.4-.5 1-1.2 2-2 .9.8 2.3 1.5 4.3 2.5v2.7c0 1-1 1.7-2 1.5-7-1.4-11.7-6.1-13.1-13.1-.2-1 .5-2 1.5-2h2.1z"/></svg>
-                                    <input type="text" name="phone" value="{{ old('phone') }}" required placeholder="080..."
+                                    <input type="text" id="phoneInput" name="phone" value="{{ old('phone') }}" required placeholder="080..."
                                            class="glass-input w-full rounded-2xl pl-11 pr-4 py-3">
                                 </div>
                             </div>
 
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label class="field-label">Password</label>
+                                    <label class="field-label" for="passwordInput">Password</label>
                                     <div class="relative">
                                         <input type="password" id="passwordInput" name="password" required placeholder="••••••••"
                                                class="glass-input w-full rounded-2xl px-4 py-3 pr-11">
@@ -224,9 +229,11 @@
                                             </svg>
                                         </button>
                                     </div>
+                                    <div class="password-meter mt-2"><span id="passwordMeter"></span></div>
+                                    <p id="passwordHint" class="password-hint mt-1">Use at least 8 characters.</p>
                                 </div>
                                 <div>
-                                    <label class="field-label">Confirm password</label>
+                                    <label class="field-label" for="passwordConfirmInput">Confirm password</label>
                                     <div class="relative">
                                         <input type="password" id="passwordConfirmInput" name="password_confirmation" required placeholder="••••••••"
                                                class="glass-input w-full rounded-2xl px-4 py-3 pr-11">
@@ -237,6 +244,7 @@
                                             </svg>
                                         </button>
                                     </div>
+                                    <p id="passwordMatchHint" class="password-hint mt-1">Passwords must match.</p>
                                 </div>
                             </div>
 
@@ -245,7 +253,7 @@
                                 I agree to the Terms and Conditions
                             </label>
 
-                            <button type="submit" class="btn-nudge w-full rounded-2xl bg-emerald-600 px-4 py-3.5 font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition">
+                            <button id="registerButton" type="submit" class="btn-nudge w-full rounded-2xl bg-emerald-600 px-4 py-3.5 font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition">
                                 Create account
                             </button>
                         </form>
@@ -306,6 +314,33 @@
     </div>
 
     <script>
+        const registerForm = document.getElementById('registerForm');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordConfirmInput = document.getElementById('passwordConfirmInput');
+        const passwordMeter = document.getElementById('passwordMeter');
+        const passwordHint = document.getElementById('passwordHint');
+        const passwordMatchHint = document.getElementById('passwordMatchHint');
+
+        function updatePasswordHints() {
+            const password = passwordInput.value;
+            const score = [password.length >= 8, /[A-Z]/.test(password), /[0-9]/.test(password), /[^A-Za-z0-9]/.test(password)].filter(Boolean).length;
+            passwordMeter.style.width = `${Math.min(score, 4) * 25}%`;
+            passwordMeter.style.backgroundColor = score < 2 ? '#e11d48' : score < 4 ? '#d97706' : '#059669';
+            passwordHint.textContent = score < 2 ? 'Use 8+ characters with a number or symbol.' : score < 4 ? 'Good start. Add a capital letter and symbol.' : 'Strong password.';
+            passwordHint.style.color = score < 2 ? '#be123c' : score < 4 ? '#b45309' : '#047857';
+            passwordMatchHint.textContent = passwordConfirmInput.value && password === passwordConfirmInput.value ? 'Passwords match.' : 'Passwords must match.';
+            passwordMatchHint.style.color = passwordConfirmInput.value && password === passwordConfirmInput.value ? '#047857' : '#7a8580';
+        }
+
+        passwordInput.addEventListener('input', updatePasswordHints);
+        passwordConfirmInput.addEventListener('input', updatePasswordHints);
+        registerForm.addEventListener('submit', function () {
+            const button = document.getElementById('registerButton');
+            button.disabled = true;
+            button.textContent = 'Creating account...';
+            button.classList.add('opacity-80', 'cursor-wait');
+        });
+
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
             input.type = input.type === 'password' ? 'text' : 'password';

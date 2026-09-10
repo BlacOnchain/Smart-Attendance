@@ -165,6 +165,10 @@
             outline: none;
             transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
+        @media (max-width: 380px) {
+            .otp-slot { width: 38px; height: 48px; font-size: 18px; border-radius: 11px; }
+            #otpSlotRow { gap: 6px; }
+        }
         .otp-slot:focus {
             border-color: rgba(13,148,136,0.6);
             box-shadow: 0 0 0 4px rgba(13,148,136,0.14);
@@ -237,10 +241,10 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('lecturer.login.submit') }}" method="POST" class="mt-7 space-y-4">
+                        <form id="lecturerLoginForm" action="{{ route('lecturer.login.submit') }}" method="POST" class="mt-7 space-y-4">
                             @csrf
                             <div>
-                                <label class="field-label">Email address</label>
+                                <label class="field-label" for="emailInput">Email address</label>
                                 <div class="relative">
                                     <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5L12 13l8.5-6.5"/></svg>
                                     <input type="email" name="email" id="emailInput" value="{{ old('email') }}" required placeholder="you@example.com"
@@ -249,7 +253,7 @@
                             </div>
 
                             <div>
-                                <label class="field-label">Password</label>
+                                <label class="field-label" for="passwordInput">Password</label>
                                 <div class="relative">
                                     <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 118 0v3"/></svg>
                                     <input type="password" id="passwordInput" name="password" required placeholder="••••••••"
@@ -267,7 +271,7 @@
                                 <button type="button" onclick="openForgotModal()" class="font-medium bg-transparent border-none cursor-pointer" style="color: var(--brand-dark)">Forgot password?</button>
                             </div>
 
-                            <button type="submit" class="btn-nudge mt-2 w-full rounded-2xl px-4 py-3.5 font-semibold text-white shadow-lg transition" style="background: var(--brand); box-shadow: 0 10px 25px -8px rgba(13,148,136,0.4);" onmouseover="this.style.background='var(--brand-dark)'" onmouseout="this.style.background='var(--brand)'">
+                            <button id="lecturerLoginButton" type="submit" class="btn-nudge mt-2 w-full rounded-2xl px-4 py-3.5 font-semibold text-white shadow-lg transition" style="background: var(--brand); box-shadow: 0 10px 25px -8px rgba(13,148,136,0.4);" onmouseover="this.style.background='var(--brand-dark)'" onmouseout="this.style.background='var(--brand)'">
                                 Sign in as lecturer
                             </button>
                         </form>
@@ -421,6 +425,13 @@
     </div>
 
     <script>
+        document.getElementById('lecturerLoginForm').addEventListener('submit', function () {
+            const button = document.getElementById('lecturerLoginButton');
+            button.disabled = true;
+            button.textContent = 'Signing in...';
+            button.classList.add('opacity-80', 'cursor-wait');
+        });
+
         function togglePassword() {
             const input = document.getElementById('passwordInput');
             input.type = input.type === 'password' ? 'text' : 'password';

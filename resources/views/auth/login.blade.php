@@ -171,6 +171,10 @@
             outline: none;
             transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
+        @media (max-width: 380px) {
+            .otp-slot { width: 38px; height: 48px; font-size: 18px; border-radius: 11px; }
+            #otpSlotRow { gap: 6px; }
+        }
         .otp-slot:focus {
             border-color: rgba(5,150,105,0.6);
             box-shadow: 0 0 0 4px rgba(5,150,105,0.14);
@@ -250,10 +254,10 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('login.submit') }}" method="POST" autocomplete="off" class="mt-7 space-y-4">
+                        <form id="studentLoginForm" action="{{ route('login.submit') }}" method="POST" autocomplete="off" class="mt-7 space-y-4">
                             @csrf
                             <div>
-                                <label class="field-label">Email address</label>
+                                <label class="field-label" for="emailInput">Email address</label>
                                 <div class="relative">
                                     <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5L12 13l8.5-6.5"/></svg>
                                     <input type="email" name="email" id="emailInput" value="" autocomplete="off" required placeholder="you@example.com"
@@ -262,7 +266,7 @@
                             </div>
 
                             <div>
-                                <label class="field-label">Password</label>
+                                <label class="field-label" for="passwordInput">Password</label>
                                 <div class="relative">
                                     <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 118 0v3"/></svg>
                                     <input type="password" id="passwordInput" name="password" autocomplete="new-password" required placeholder="••••••••"
@@ -284,7 +288,7 @@
                                 <button type="button" onclick="openForgotModal()" class="font-medium text-emerald-700 hover:text-emerald-800 bg-transparent border-none cursor-pointer">Forgot password?</button>
                             </div>
 
-                            <button type="submit" class="btn-nudge w-full rounded-2xl bg-emerald-600 px-4 py-3.5 font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition">
+                            <button id="studentLoginButton" type="submit" class="btn-nudge w-full rounded-2xl bg-emerald-600 px-4 py-3.5 font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition">
                                 Sign in
                             </button>
                         </form>
@@ -473,6 +477,13 @@
             const input = document.getElementById('passwordInput');
             input.type = input.type === 'password' ? 'text' : 'password';
         }
+
+        document.getElementById('studentLoginForm').addEventListener('submit', function () {
+            const button = document.getElementById('studentLoginButton');
+            button.disabled = true;
+            button.textContent = 'Signing in...';
+            button.classList.add('opacity-80', 'cursor-wait');
+        });
 
         function openForgotModal() {
             document.getElementById('forgotModal').classList.remove('hidden');
