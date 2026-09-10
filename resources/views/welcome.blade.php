@@ -157,6 +157,33 @@
             90%  { opacity: 1; }
             100% { left: 88%; opacity: 0; }
         }
+
+        /* ---- 07 attendance flow ---- */
+        .flow-node { animation: nodefloat 3.6s ease-in-out infinite; }
+        .flow-node:nth-child(2) { animation-delay: .35s; }
+        .flow-node:nth-child(3) { animation-delay: .7s; }
+        @keyframes nodefloat {
+            0%, 100% { transform: translateY(0); box-shadow: 0 0 0 0 rgba(5,150,105,0); }
+            50% { transform: translateY(-7px); box-shadow: 0 12px 24px -14px rgba(5,150,105,.65); }
+        }
+        .flow-line::after {
+            content: ''; position: absolute; top: -3px; left: 0; width: 7px; height: 7px;
+            border-radius: 999px; background: #059669; box-shadow: 0 0 0 5px rgba(5,150,105,.12);
+            animation: flowtravel 2.8s linear infinite;
+        }
+        @keyframes flowtravel {
+            0% { left: 0; opacity: 0; }
+            12%, 82% { opacity: 1; }
+            100% { left: calc(100% - 7px); opacity: 0; }
+        }
+        .point-dot { animation: pointpulse 2.4s ease-in-out infinite; }
+        .point-dot:nth-child(2) { animation-delay: .25s; }
+        .point-dot:nth-child(3) { animation-delay: .5s; }
+        .point-dot:nth-child(4) { animation-delay: .75s; }
+        @keyframes pointpulse {
+            0%, 100% { transform: scale(1); opacity: .7; }
+            50% { transform: scale(1.35); opacity: 1; }
+        }
     </style>
 </head>
 <body class="min-h-screen antialiased selection:bg-emerald-600 selection:text-white overflow-x-hidden">
@@ -442,9 +469,89 @@
 
     </div>
 
+    <!-- Why it works -->
+    <section class="max-w-5xl mx-auto px-6 pt-4 pb-28">
+        <div class="reveal text-center" data-anim="rise">
+            <span class="num-badge" style="--accent:#059669;--accent-soft:rgba(5,150,105,0.1);--accent-line:rgba(5,150,105,0.25)">07 · WHY IT WORKS</span>
+            <h2 class="mt-5 text-3xl sm:text-4xl font-semibold tracking-tight">Less paperwork. More signal.</h2>
+            <p class="mt-4 max-w-2xl mx-auto text-neutral-600 leading-relaxed">A small set of thoughtful details keeps attendance quick for students and useful for the people running each class.</p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
+            <div class="reveal feature-card rounded-2xl p-5" data-anim="rise" style="transition-delay:.04s">
+                <div class="flex items-center justify-between">
+                    <span class="point-dot h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                    <span class="mono text-xs text-neutral-400">01</span>
+                </div>
+                <h3 class="mt-8 font-semibold">Fast check-ins</h3>
+                <p class="mt-2 text-sm text-neutral-500 leading-relaxed">One scan takes seconds, even when a whole class arrives together.</p>
+            </div>
+            <div class="reveal feature-card rounded-2xl p-5" data-anim="rise" style="transition-delay:.1s">
+                <div class="flex items-center justify-between">
+                    <span class="point-dot h-2.5 w-2.5 rounded-full bg-amber-500"></span>
+                    <span class="mono text-xs text-neutral-400">02</span>
+                </div>
+                <h3 class="mt-8 font-semibold">Fewer disputes</h3>
+                <p class="mt-2 text-sm text-neutral-500 leading-relaxed">A live record gives lecturers a clear view of who checked in and when.</p>
+            </div>
+            <div class="reveal feature-card rounded-2xl p-5" data-anim="rise" style="transition-delay:.16s">
+                <div class="flex items-center justify-between">
+                    <span class="point-dot h-2.5 w-2.5 rounded-full bg-indigo-500"></span>
+                    <span class="mono text-xs text-neutral-400">03</span>
+                </div>
+                <h3 class="mt-8 font-semibold">Useful records</h3>
+                <p class="mt-2 text-sm text-neutral-500 leading-relaxed">Attendance history stays searchable by course and session when it matters.</p>
+            </div>
+            <div class="reveal feature-card rounded-2xl p-5" data-anim="rise" style="transition-delay:.22s">
+                <div class="flex items-center justify-between">
+                    <span class="point-dot h-2.5 w-2.5 rounded-full bg-rose-500"></span>
+                    <span class="mono text-xs text-neutral-400">04</span>
+                </div>
+                <h3 class="mt-8 font-semibold">Built for the room</h3>
+                <p class="mt-2 text-sm text-neutral-500 leading-relaxed">The flow is simple enough for a phone, a projector, and a busy lecture hall.</p>
+            </div>
+        </div>
+
+        <div class="reveal feature-card rounded-2xl p-8 sm:p-10 mt-5" data-anim="scale">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-7">
+                <div>
+                    <p class="mono text-xs font-semibold tracking-widest text-emerald-700">THE CHECK-IN LOOP</p>
+                    <h3 class="mt-3 text-xl sm:text-2xl font-semibold">From live code to useful record</h3>
+                    <p class="mt-3 text-sm text-neutral-500 max-w-md leading-relaxed">Every step is visible, timed, and connected so the record reflects the room as it is.</p>
+                </div>
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-center">
+                    <div class="flow-node h-16 w-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex flex-col items-center justify-center text-emerald-700">
+                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h3v3H8zM13 8h3v3h-3zM8 13h3v3H8zM14 14h2v2h-2z"/></svg>
+                        <span class="mt-1 text-[10px] font-semibold">Code</span>
+                    </div>
+                    <div class="flow-line relative h-px w-10 sm:w-14 bg-emerald-200"></div>
+                    <div class="flow-node h-16 w-16 rounded-2xl bg-sky-50 border border-sky-200 flex flex-col items-center justify-center text-sky-700">
+                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8V5a1 1 0 011-1h3M4 16v3a1 1 0 001 1h3M20 8V5a1 1 0 00-1-1h-3M20 16v3a1 1 0 01-1 1h-3"/><path d="M8 12h8"/></svg>
+                        <span class="mt-1 text-[10px] font-semibold">Scan</span>
+                    </div>
+                    <div class="flow-line relative h-px w-10 sm:w-14 bg-sky-200"></div>
+                    <div class="flow-node h-16 w-16 rounded-2xl bg-indigo-50 border border-indigo-200 flex flex-col items-center justify-center text-indigo-700">
+                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 12l4 4L19 6"/><circle cx="12" cy="12" r="9"/></svg>
+                        <span class="mt-1 text-[10px] font-semibold">Record</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
-    <footer class="border-t border-neutral-200 py-10 mt-20 text-center">
-        <p class="text-xs text-neutral-400">Smart Attendance · a departmental attendance system built by <span class="font-medium text-neutral-500">Blac</span></p>
+    <footer class="border-t border-neutral-200 py-12 mt-4">
+        <div class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="text-center sm:text-left">
+                <p class="text-sm font-semibold text-neutral-700">Smart Attendance</p>
+                <p class="mt-1 text-xs text-neutral-400">Built by Blac · attendance tools for real classrooms</p>
+            </div>
+            <div class="flex items-center gap-5 text-xs font-medium text-neutral-500">
+                <a href="https://blaconchain.github.io/Portfolio/" target="_blank" rel="noreferrer" class="hover:text-emerald-700 transition">Portfolio</a>
+                <a href="https://twitter.com/Lifewithblac" target="_blank" rel="noreferrer" class="hover:text-emerald-700 transition">Twitter · @Lifewithblac</a>
+                <a href="https://www.linkedin.com/in/lifewithblac" target="_blank" rel="noreferrer" class="hover:text-emerald-700 transition">LinkedIn</a>
+            </div>
+        </div>
     </footer>
 
     <script>
