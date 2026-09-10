@@ -15,6 +15,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // Trust all proxies — required for ngrok's HTTPS-to-local-HTTP handoff.
         $middleware->trustProxies(at: '*');
 
+        // Logout is safe to repeat and may be submitted from a mobile page
+        // restored from browser cache with an expired CSRF token. Keep the
+        // request POST-only while allowing that stale logout form to finish.
+        $middleware->validateCsrfTokens(except: [
+            'logout',
+        ]);
+
         // Registers the 'role' alias used throughout web.php as role:lecturer / role:student.
         $middleware->alias([
             'role' => RoleMiddleware::class,

@@ -37,34 +37,24 @@
         80% { transform: translateX(4px); }
     }
 
-    /* Orbit collapse verification animation */
-    .orbit {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
+    .otp-slot.filled {
+        border-color: rgba(5,150,105,0.5);
+        background: rgba(5,150,105,0.08);
+        animation: otpPop .28s cubic-bezier(.16,1,.3,1);
     }
-    .orbit-ring {
-        width: 110px;
-        height: 110px;
-        fill: none;
-        stroke: rgba(5,150,105,0.45);
-        stroke-width: 1.5;
-        stroke-dasharray: 2 6;
-        animation: orbitSpin 2.4s linear infinite;
-    }
-    @keyframes orbitSpin {
-        to { transform: rotate(360deg); }
-    }
-    .orbit_hub {
-        position: absolute;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: var(--brand);
-        box-shadow: 0 0 18px 4px rgba(5,150,105,0.45);
+    .otp-slot.ready { border-color: rgba(5,150,105,0.7); background: rgba(5,150,105,0.13); color: #047857; }
+    .otp-slot.checking { animation: otpCheck .55s ease both; }
+    @keyframes otpPop { from { transform: scale(.82); opacity: .55; } to { transform: scale(1); opacity: 1; } }
+    @keyframes otpCheck { 0% { transform: translateY(0); } 45% { transform: translateY(-7px); } 100% { transform: translateY(0); } }
+    .otp-status { min-height: 18px; transition: opacity .2s ease, transform .2s ease; }
+    .otp-status.checking { color: var(--brand-dark); animation: statusIn .35s ease both; }
+    @keyframes statusIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .password-meter { height: 4px; border-radius: 999px; background: #e4e6df; overflow: hidden; }
+    .password-meter span { display: block; height: 100%; width: 0; border-radius: inherit; transition: width .25s ease, background-color .25s ease; }
+    .password-hint { font-size: 11px; color: #7a8580; }
+    @media (max-width: 380px) {
+        .otp-slot { width: 38px; height: 48px; font-size: 18px; border-radius: 11px; }
+        #otpSlotRow { gap: 6px; }
     }
 
     .profile-card {
@@ -389,7 +379,15 @@
 
 <!-- FORGOT / CHANGE PASSWORD MODAL OVERLAY -->
 <div id="forgotModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4" style="background: rgba(16,32,26,0.45); backdrop-filter: blur(6px);">
-    <div class="w-full max-w-md rounded-[32px] p-8 shadow-2xl bg-white border" style="border-color: var(--line); color: var(--ink);">
+    <div class="w-full max-w-md rounded-[28px] p-5 shadow-2xl bg-white border sm:p-8" style="border-color: var(--line); color: var(--ink);">
+
+        <div id="passwordProgress" class="mb-2 flex items-center gap-2" aria-label="Password change progress">
+            <span class="h-1.5 flex-1 rounded-full bg-emerald-500"></span>
+            <span class="h-1.5 flex-1 rounded-full bg-emerald-200"></span>
+            <span class="h-1.5 flex-1 rounded-full bg-emerald-200"></span>
+            <span class="h-1.5 flex-1 rounded-full bg-emerald-200"></span>
+        </div>
+        <p id="passwordStepLabel" class="mb-6 text-[11px] font-semibold uppercase tracking-wider" style="color: var(--brand-dark)">Step 1 of 4 · Verify your email</p>
 
         <!-- Step 1: Confirm Email (Pre-filled with user's email) -->
         <div id="forgotStep1">
@@ -412,7 +410,7 @@
             </div>
         </div>
 
-        <!-- Step 2: Enter OTP Code with Orbit Animation -->
+        <!-- Step 2: Enter OTP Code -->
         <div id="forgotStep2" class="hidden text-center">
             <div class="flex items-center justify-between mb-2">
                 <h3 class="text-2xl font-bold">Enter verification code</h3>
@@ -422,7 +420,7 @@
 
             <div id="step2Error" class="hidden mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-sm text-rose-700 text-left"></div>
 
-            <div class="relative flex items-center justify-center py-6" style="min-height: 90px;">
+            <div class="flex flex-col items-center justify-center py-5" style="min-height: 90px;">
                 <div id="otpSlotRow" class="flex items-center justify-center gap-2.5">
                     <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="0" autocomplete="one-time-code">
                     <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="1">
@@ -431,12 +429,7 @@
                     <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="4">
                     <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="5">
                 </div>
-                <div class="orbit hidden" id="otpOrbit">
-                    <svg class="orbit-ring" viewBox="0 0 110 110">
-                        <circle cx="55" cy="55" r="46" vector-effect="non-scaling-stroke" />
-                    </svg>
-                    <span class="orbit_hub" id="orbitHub"></span>
-                </div>
+                <p id="otpStatus" class="otp-status mt-4 text-xs" style="color: #9aa39c">Enter all 6 digits</p>
             </div>
             <input type="hidden" id="resetOtp">
         </div>
@@ -455,10 +448,13 @@
                 <div>
                     <label class="field-label">New password</label>
                     <input type="password" id="newPassword" required placeholder="••••••••" class="glass-input w-full rounded-2xl px-4 py-3">
+                    <div class="password-meter mt-2"><span id="changePasswordMeter"></span></div>
+                    <p id="changePasswordHint" class="password-hint mt-1">Use at least 8 characters.</p>
                 </div>
                 <div>
                     <label class="field-label">Confirm new password</label>
                     <input type="password" id="newPasswordConfirmation" required placeholder="••••••••" class="glass-input w-full rounded-2xl px-4 py-3">
+                    <p id="changePasswordMatchHint" class="password-hint mt-1">Passwords must match.</p>
                 </div>
                 <button type="button" onclick="resetPasswordRequest()" id="resetPassBtn" class="w-full rounded-2xl bg-emerald-600 px-4 py-3.5 font-semibold text-white hover:bg-emerald-700 transition">
                     Update password
@@ -504,6 +500,26 @@
     let isEditing = @json($errors->any());
     let hasPasswordError = @json($errors->has('current_password'));
     const csrfToken = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').content : '{{ csrf_token() }}';
+    const changePasswordInput = document.getElementById('newPassword');
+    const changePasswordConfirmation = document.getElementById('newPasswordConfirmation');
+
+    function updateChangePasswordHints() {
+        if (!changePasswordInput || !changePasswordConfirmation) return;
+        const password = changePasswordInput.value;
+        const score = [password.length >= 8, /[A-Z]/.test(password), /[0-9]/.test(password), /[^A-Za-z0-9]/.test(password)].filter(Boolean).length;
+        const meter = document.getElementById('changePasswordMeter');
+        const hint = document.getElementById('changePasswordHint');
+        const matchHint = document.getElementById('changePasswordMatchHint');
+        meter.style.width = `${Math.min(score, 4) * 25}%`;
+        meter.style.backgroundColor = score < 2 ? '#e11d48' : score < 4 ? '#d97706' : '#059669';
+        hint.textContent = score < 2 ? 'Use 8+ characters with a number or symbol.' : score < 4 ? 'Good start. Add a capital letter and symbol.' : 'Strong password.';
+        hint.style.color = score < 2 ? '#be123c' : score < 4 ? '#b45309' : '#047857';
+        matchHint.textContent = changePasswordConfirmation.value && password === changePasswordConfirmation.value ? 'Passwords match.' : 'Passwords must match.';
+        matchHint.style.color = changePasswordConfirmation.value && password === changePasswordConfirmation.value ? '#047857' : '#7a8580';
+    }
+
+    changePasswordInput?.addEventListener('input', updateChangePasswordHints);
+    changePasswordConfirmation?.addEventListener('input', updateChangePasswordHints);
 
     async function logoutSession(id, buttonEl) {
         const row = buttonEl.closest('[data-login-row]');
@@ -623,11 +639,29 @@
     function openForgotModal() {
         document.getElementById('forgotModal').classList.remove('hidden');
         document.getElementById('forgotModal').classList.add('flex');
+        updatePasswordProgress(1);
     }
 
     function closeForgotModal() {
         document.getElementById('forgotModal').classList.add('hidden');
         document.getElementById('forgotModal').classList.remove('flex');
+    }
+
+    function updatePasswordProgress(step) {
+        const progress = document.getElementById('passwordProgress');
+        const label = document.getElementById('passwordStepLabel');
+        const labels = {
+            1: 'Step 1 of 4 · Verify your email',
+            2: 'Step 2 of 4 · Enter the email code',
+            3: 'Step 3 of 4 · Create a new password',
+            4: 'Step 4 of 4 · Password updated',
+        };
+        if (label) label.textContent = labels[step];
+        if (progress) {
+            Array.from(progress.children).forEach((bar, index) => {
+                bar.className = `h-1.5 flex-1 rounded-full ${index < step ? 'bg-emerald-500' : 'bg-emerald-200'}`;
+            });
+        }
     }
 
     async function sendOtpRequest() {
@@ -650,6 +684,7 @@
             if (response.ok) {
                 document.getElementById('forgotStep1').classList.add('hidden');
                 document.getElementById('forgotStep2').classList.remove('hidden');
+                updatePasswordProgress(2);
                 if (window.resetOtpSlots) window.resetOtpSlots();
             } else {
                 errorBox.textContent = data.message || 'Unable to send code.';
@@ -688,6 +723,7 @@
             if (response.ok) {
                 document.getElementById('forgotStep2').classList.add('hidden');
                 document.getElementById('forgotStep3').classList.remove('hidden');
+                updatePasswordProgress(3);
             } else {
                 errorBox.textContent = data.message || 'Invalid or expired verification code.';
                 errorBox.classList.remove('hidden');
@@ -735,6 +771,7 @@
             if (response.ok) {
                 document.getElementById('forgotStep3').classList.add('hidden');
                 document.getElementById('forgotStep4').classList.remove('hidden');
+                updatePasswordProgress(4);
                 setTimeout(() => {
                     window.location.reload();
                 }, 3000);
@@ -748,12 +785,12 @@
         }
     }
 
-    // --- 6-Slot OTP Interactive Logic & Orbit Animation ---
+    // --- 6-Slot OTP Interactive Logic & Verification Animation ---
     (function () {
         const slots = Array.from(document.querySelectorAll('.otp-slot'));
         const hiddenOtp = document.getElementById('resetOtp');
         const slotRow = document.getElementById('otpSlotRow');
-        const orbit = document.getElementById('otpOrbit');
+        const status = document.getElementById('otpStatus');
 
         function syncHidden() {
             if (hiddenOtp) hiddenOtp.value = slots.map(s => s.value).join('');
@@ -763,12 +800,13 @@
             slot.addEventListener('input', () => {
                 slot.value = slot.value.replace(/[^0-9]/g, '').slice(0, 1);
                 slot.classList.toggle('filled', slot.value !== '');
+                slot.classList.remove('ready');
                 syncHidden();
                 if (slot.value && i < slots.length - 1) {
                     slots[i + 1].focus();
                 }
                 if (slots.every(s => s.value !== '')) {
-                    playOrbitCollapse();
+                    verifyWithAnimation();
                 }
             });
 
@@ -789,57 +827,46 @@
                 });
                 syncHidden();
                 if (pasted.length === 6) {
-                    playOrbitCollapse();
+                    verifyWithAnimation();
                 } else if (slots[pasted.length]) {
                     slots[pasted.length].focus();
                 }
             });
         });
 
-        function playOrbitCollapse() {
-            const hub = document.getElementById('orbitHub');
-            if (orbit) orbit.classList.remove('hidden');
-            if (hub) {
-                const hRect = hub.getBoundingClientRect();
-                const centerX = hRect.left + hRect.width / 2;
-                const centerY = hRect.top + hRect.height / 2;
-                slots.forEach((slot, i) => {
-                    const rect = slot.getBoundingClientRect();
-                    const dx = centerX - (rect.left + rect.width / 2);
-                    const dy = centerY - (rect.top + rect.height / 2);
-                    slot.animate([
-                        { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
-                        { transform: `translate(${dx * 0.6}px, ${dy * 0.6}px) rotate(220deg)`, opacity: 0.7, offset: 0.6 },
-                        { transform: `translate(${dx}px, ${dy}px) rotate(450deg)`, opacity: 0 },
-                    ], {
-                        duration: 550,
-                        delay: i * 40,
-                        easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
-                        fill: 'forwards',
-                    });
-                });
-            }
-            setTimeout(() => { if (slotRow) slotRow.style.visibility = 'hidden'; }, 550 + slots.length * 40);
-            setTimeout(() => { verifyOtpRequest(); }, 700 + slots.length * 40);
+        function verifyWithAnimation() {
+            if (slotRow.dataset.checking === 'true') return;
+            slotRow.dataset.checking = 'true';
+            slots.forEach((slot, i) => {
+                slot.classList.add('ready', 'checking');
+                slot.style.animationDelay = `${i * 45}ms`;
+            });
+            status.textContent = 'Checking your code...';
+            status.classList.add('checking');
+            setTimeout(() => { verifyOtpRequest(); }, 520);
         }
 
         window.resetOtpSlots = function () {
             slots.forEach(s => {
                 s.getAnimations().forEach(a => a.cancel());
                 s.value = '';
-                s.classList.remove('filled', 'error');
+                s.classList.remove('filled', 'ready', 'checking', 'error');
+                s.style.animationDelay = '';
             });
-            if (slotRow) slotRow.style.visibility = 'visible';
-            if (orbit) orbit.classList.add('hidden');
+            slotRow.dataset.checking = 'false';
+            status.textContent = 'Enter all 6 digits';
+            status.classList.remove('checking');
             syncHidden();
             if (slots[0]) slots[0].focus();
         };
 
         window.markOtpError = function () {
-            if (slotRow) slotRow.style.visibility = 'visible';
-            if (orbit) orbit.classList.add('hidden');
+            slotRow.dataset.checking = 'false';
+            status.textContent = 'That code was not accepted. Try again.';
+            status.classList.remove('checking');
             slots.forEach(s => {
                 s.getAnimations().forEach(a => a.cancel());
+                s.classList.remove('ready', 'checking');
                 s.classList.add('error');
             });
             setTimeout(() => slots.forEach(s => s.classList.remove('error')), 400);
