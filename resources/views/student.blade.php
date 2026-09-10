@@ -163,6 +163,44 @@
             transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
         }
 
+        .journey-track {
+            position: relative;
+        }
+        .journey-track::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 12%;
+            right: 12%;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(5,150,105,.18), rgba(5,150,105,.6), rgba(5,150,105,.18));
+        }
+        .journey-node {
+            position: relative;
+            z-index: 1;
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+        .journey-node:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 25px -16px rgba(5,150,105,.65);
+            border-color: rgba(5,150,105,.45) !important;
+        }
+        .journey-node.is-current {
+            animation: journeyPulse 2.4s ease-in-out infinite;
+        }
+        @keyframes journeyPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(5,150,105,0); }
+            50% { box-shadow: 0 0 0 7px rgba(5,150,105,.10); }
+        }
+        .journey-dot {
+            animation: journeyTravel 3.2s linear infinite;
+        }
+        @keyframes journeyTravel {
+            0% { left: 12%; opacity: 0; }
+            12%, 82% { opacity: 1; }
+            100% { left: 88%; opacity: 0; }
+        }
+
         @media (prefers-reduced-motion: reduce) {
             .stagger-up, .stagger-left, .pulse-attention, .progress-fill, .ring-pulse-once {
                 animation: none !important;
@@ -212,17 +250,21 @@
                         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="2"/><rect x="13" y="13" width="7.5" height="7.5" rx="2"/></svg></span>
                         Dashboard
                     </a>
-                    <a href="{{ route('student.profile') }}" onclick="closeSidebar()" class="nav-link state-transition flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-sm font-semibold lg:py-2.5 {{ request()->routeIs('student.profile') ? 'active' : 'text-slate-700 hover:bg-emerald-50/60' }}">
-                        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></span>
-                        My Profile
+                    <a href="{{ route('student.camera') }}" onclick="closeSidebar()" class="nav-link state-transition flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-sm font-semibold lg:py-2.5 {{ request()->routeIs('student.camera') ? 'active' : 'text-slate-700 hover:bg-emerald-50/60' }}">
+                        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="6" width="17" height="13" rx="2.5"/><circle cx="12" cy="12.5" r="3.2"/><path d="M8.5 6L10 4h4l1.5 2"/></svg></span>
+                        QR Scanner
                     </a>
                     <a href="{{ route('student.timetable') }}" onclick="closeSidebar()" class="nav-link state-transition flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-sm font-semibold lg:py-2.5 {{ request()->routeIs('student.timetable') ? 'active' : 'text-slate-700 hover:bg-emerald-50/60' }}">
                         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4.5" width="16" height="15" rx="2.5"/><path d="M4 9.5h16M9 4v3M15 4v3"/></svg></span>
                         Timetable
                     </a>
-                    <a href="{{ route('student.camera') }}" onclick="closeSidebar()" class="nav-link state-transition flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-sm font-semibold lg:py-2.5 {{ request()->routeIs('student.camera') ? 'active' : 'text-slate-700 hover:bg-emerald-50/60' }}">
-                        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="6" width="17" height="13" rx="2.5"/><circle cx="12" cy="12.5" r="3.2"/><path d="M8.5 6L10 4h4l1.5 2"/></svg></span>
-                        QR Scanner
+                    <a href="{{ route('student.profile') }}" onclick="closeSidebar()" class="nav-link state-transition flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-sm font-semibold lg:py-2.5 {{ request()->routeIs('student.profile') ? 'active' : 'text-slate-700 hover:bg-emerald-50/60' }}">
+                        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></span>
+                        My Profile
+                    </a>
+                    <a href="{{ route('student.course-form') }}" onclick="closeSidebar()" class="nav-link state-transition flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-sm font-semibold lg:py-2.5 {{ request()->routeIs('student.course-form') ? 'active' : 'text-slate-700 hover:bg-emerald-50/60' }}">
+                        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3.5h7l3.5 3.5V20a1 1 0 01-1 1H7a1 1 0 01-1-1V4.5a1 1 0 011-1z"/><path d="M14 3.5V8h4.5M9 12h6M9 15.5h6"/></svg></span>
+                        Course Form
                     </a>
                 </div>
             </nav>

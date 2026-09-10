@@ -127,6 +127,49 @@
         </article>
     </section>
 
+    <!-- Student journey -->
+    <section class="stagger-up rounded-2xl bg-white/80 p-5 shadow-sm border" style="--d: 0.28s; border-color: var(--line)">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <p class="eyebrow">Your attendance journey</p>
+                <h2 class="mt-1 text-xl font-bold" style="color: var(--ink)">Set up once, check in in seconds</h2>
+            </div>
+            <p class="text-xs font-medium" style="color: #7a8580">Start with your profile, then follow the live session.</p>
+        </div>
+
+        <div class="journey-track relative mt-6 grid grid-cols-4 gap-2 sm:gap-5">
+            <span class="journey-dot absolute top-[22px] h-1.5 w-1.5 rounded-full bg-emerald-600 shadow-[0_0_0_4px_rgba(5,150,105,.12)]"></span>
+            <a href="{{ route('student.profile') }}" class="journey-node rounded-2xl border bg-white/80 p-3 text-center sm:p-4" style="border-color: var(--line)">
+                <span class="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg>
+                </span>
+                <p class="mt-3 text-xs font-bold sm:text-sm">Profile</p>
+                <p class="mt-1 hidden text-[11px] sm:block" style="color: #7a8580">Set your details</p>
+            </a>
+            <a href="{{ route('student.timetable') }}" class="journey-node rounded-2xl border bg-white/80 p-3 text-center sm:p-4" style="border-color: var(--line)">
+                <span class="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4.5" width="16" height="15" rx="2.5"/><path d="M4 9.5h16M9 4v3M15 4v3"/></svg>
+                </span>
+                <p class="mt-3 text-xs font-bold sm:text-sm">Schedule</p>
+                <p class="mt-1 hidden text-[11px] sm:block" style="color: #7a8580">Find your class</p>
+            </a>
+            <a href="{{ route('student.camera') }}" class="journey-node is-current rounded-2xl border bg-white/80 p-3 text-center sm:p-4" style="border-color: var(--line)">
+                <span class="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="6" width="17" height="13" rx="2.5"/><circle cx="12" cy="12.5" r="3.2"/><path d="M8.5 6L10 4h4l1.5 2"/></svg>
+                </span>
+                <p class="mt-3 text-xs font-bold sm:text-sm">Scan</p>
+                <p class="mt-1 hidden text-[11px] sm:block" style="color: #7a8580">Check in live</p>
+            </a>
+            <a href="#courseAttendance" class="journey-node rounded-2xl border bg-white/80 p-3 text-center sm:p-4" style="border-color: var(--line)">
+                <span class="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 12l4 4L19 6"/><circle cx="12" cy="12" r="9"/></svg>
+                </span>
+                <p class="mt-3 text-xs font-bold sm:text-sm">History</p>
+                <p class="mt-1 hidden text-[11px] sm:block" style="color: #7a8580">Track progress</p>
+            </a>
+        </div>
+    </section>
+
     <!-- Quick actions + Recent check-ins, side by side -->
     <section class="grid gap-4 lg:grid-cols-[1.3fr_0.9fr]">
         <div class="stagger-up rounded-2xl bg-white/80 p-5 shadow-sm border" style="--d: 0.3s; border-color: var(--line)">
@@ -168,7 +211,7 @@
     </section>
 
     <!-- Courses + attendance section -->
-    <section class="stagger-up rounded-2xl bg-white/80 p-5 shadow-sm border" style="--d: 0.4s; border-color: var(--line)">
+    <section id="courseAttendance" class="stagger-up rounded-2xl bg-white/80 p-5 shadow-sm border" style="--d: 0.4s; border-color: var(--line)">
         <p class="eyebrow">Your courses</p>
 
         <div class="mt-4 grid gap-3 md:grid-cols-2">
