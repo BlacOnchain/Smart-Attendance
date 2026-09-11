@@ -382,24 +382,24 @@
     </div>
 </div>
 
-<!-- FORGOT / CHANGE PASSWORD MODAL OVERLAY -->
+<!-- FORGOT / CHANGE PASSWORD MODAL OVERLAY (Exact UI, Layout & Animation from Login Page) -->
 <div id="forgotModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4" style="background: rgba(16,32,26,0.45); backdrop-filter: blur(6px);">
-    <div class="w-full max-w-md rounded-[32px] p-8 shadow-2xl bg-white border animate-scale-up" style="border-color: var(--line); color: var(--ink);">
+    <div class="w-full max-w-md rounded-[32px] p-8 shadow-2xl animate-scale-up" style="background: #ffffff; border: 1px solid var(--line); color: var(--ink);">
 
-        <!-- Step 1: Confirm Email (Pre-filled with user's email) -->
+        <!-- Step 1: Enter Email -->
         <div id="forgotStep1">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-2xl font-bold">Change password</h3>
-                <button onclick="closeForgotModal()" class="text-lg font-bold" style="color: #9aa39c">✕</button>
+                <h3 class="text-2xl font-bold">Reset password</h3>
+                <button onclick="closeForgotModal()" class="text-lg font-bold" style="color:#9aa39c">✕</button>
             </div>
-            <p class="text-sm mb-6" style="color: #7a8580">We'll send a 6-digit verification code to your registered email address to verify it's you.</p>
+            <p class="text-sm mb-6" style="color:#5b6660">Enter your registered email address and we'll send you a 6-digit verification code.</p>
 
             <div id="step1Error" class="hidden mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700"></div>
 
             <div class="space-y-4">
                 <div>
-                    <label class="field-label">Your email address</label>
-                    <input type="email" id="resetEmail" value="{{ $user->email }}" readonly class="glass-input w-full rounded-2xl px-4 py-3 cursor-not-allowed" style="color: #7a8580">
+                    <label class="field-label">Email address</label>
+                    <input type="email" id="resetEmail" value="{{ $user->email }}" readonly class="glass-input w-full rounded-2xl px-4 py-3 cursor-not-allowed" style="color: #5b6660">
                 </div>
                 <button type="button" onclick="sendOtpRequest()" id="sendOtpBtn" class="w-full rounded-2xl bg-emerald-600 px-4 py-3.5 font-semibold text-white hover:bg-emerald-700 transition">
                     Send verification code
@@ -407,18 +407,18 @@
             </div>
         </div>
 
-        <!-- Step 2: Enter OTP Code with Clean Ready/Checking Animation -->
+        <!-- Step 2: Enter OTP Code -->
         <div id="forgotStep2" class="hidden">
             <div class="flex items-center justify-between mb-2">
                 <h3 class="text-2xl font-bold">Enter verification code</h3>
-                <button onclick="closeForgotModal()" class="text-lg font-bold" style="color: #9aa39c">✕</button>
+                <button onclick="closeForgotModal()" class="text-lg font-bold" style="color:#9aa39c">✕</button>
             </div>
-            <p class="text-sm mb-5" style="color: #7a8580">Enter the 6-digit code sent to your registered email.</p>
+            <p class="text-sm mb-5" style="color:#5b6660">Enter the 6-digit code sent to your email inbox.</p>
 
-            <div id="step2Error" class="hidden mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-sm text-rose-700 text-left"></div>
+            <div id="step2Error" class="hidden mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700 text-left"></div>
 
             <div class="flex flex-col items-center justify-center py-5" style="min-height: 90px;">
-                <div id="otpSlotRow" class="flex items-center justify-center gap-2.5" data-checking="false">
+                <div id="otpSlotRow" class="flex items-center justify-center gap-2.5">
                     <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="0" autocomplete="one-time-code">
                     <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="1">
                     <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="2">
@@ -428,6 +428,7 @@
                 </div>
                 <p id="otpStatus" class="otp-status mt-4 text-xs text-neutral-400">Enter all 6 digits</p>
             </div>
+
             <input type="hidden" id="resetOtp">
         </div>
 
@@ -435,9 +436,9 @@
         <div id="forgotStep3" class="hidden">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-2xl font-bold">New password</h3>
-                <button onclick="closeForgotModal()" class="text-lg font-bold" style="color: #9aa39c">✕</button>
+                <button onclick="closeForgotModal()" class="text-lg font-bold" style="color:#9aa39c">✕</button>
             </div>
-            <p class="text-sm mb-6" style="color: #7a8580">Choose a secure new password for your student account.</p>
+            <p class="text-sm mb-6" style="color:#5b6660">Create a secure new password for your account.</p>
 
             <div id="step3Error" class="hidden mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700"></div>
 
@@ -462,7 +463,7 @@
                 ✓
             </div>
             <h3 class="text-2xl font-bold">Password updated</h3>
-            <p class="mt-2 text-sm" style="color: #7a8580">Your password has been changed successfully. Reloading...</p>
+            <p class="mt-2 text-sm" style="color:#5b6660">Your password has been changed successfully. Redirecting you...</p>
         </div>
 
     </div>
@@ -609,7 +610,7 @@
         form.submit();
     }
 
-    // --- Forgot / Change Password Modal Logic ---
+    // --- Forgot / Change Password Modal & OTP Interactive Logic (Exact Match to Login Page) ---
     function openForgotModal() {
         document.getElementById('forgotModal').classList.remove('hidden');
         document.getElementById('forgotModal').classList.add('flex');
@@ -624,6 +625,12 @@
         const email = document.getElementById('resetEmail').value;
         const errorBox = document.getElementById('step1Error');
         errorBox.classList.add('hidden');
+
+        if (!email) {
+            errorBox.textContent = 'Please enter your email address.';
+            errorBox.classList.remove('hidden');
+            return;
+        }
 
         try {
             const response = await fetch("{{ route('password.otp.send') }}", {
@@ -640,9 +647,9 @@
             if (response.ok) {
                 document.getElementById('forgotStep1').classList.add('hidden');
                 document.getElementById('forgotStep2').classList.remove('hidden');
-                if (window.resetOtpSlots) window.resetOtpSlots();
+                if (window.resetOtpSlots) resetOtpSlots();
             } else {
-                errorBox.textContent = data.message || 'Unable to send code.';
+                errorBox.textContent = data.message || 'Unable to send code. Check email address.';
                 errorBox.classList.remove('hidden');
             }
         } catch (e) {
@@ -651,95 +658,6 @@
         }
     }
 
-    async function verifyOtpRequest() {
-        const email = document.getElementById('resetEmail').value;
-        const otp_code = document.getElementById('resetOtp').value;
-        const errorBox = document.getElementById('step2Error');
-        errorBox.classList.add('hidden');
-
-        if (!otp_code || otp_code.length !== 6) {
-            errorBox.textContent = 'Please enter the valid 6-digit code.';
-            errorBox.classList.remove('hidden');
-            if (window.markOtpError) window.markOtpError();
-            return;
-        }
-
-        try {
-            const response = await fetch("{{ route('password.otp.verify') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ email, otp_code })
-            });
-            const data = await response.json();
-
-            if (response.ok) {
-                document.getElementById('forgotStep2').classList.add('hidden');
-                document.getElementById('forgotStep3').classList.remove('hidden');
-            } else {
-                errorBox.textContent = data.message || 'Invalid or expired verification code.';
-                errorBox.classList.remove('hidden');
-                if (window.markOtpError) window.markOtpError();
-            }
-        } catch (e) {
-            errorBox.textContent = 'Connection error. Please try again.';
-            errorBox.classList.remove('hidden');
-            if (window.markOtpError) window.markOtpError();
-        }
-    }
-
-    async function resetPasswordRequest() {
-        const email = document.getElementById('resetEmail').value;
-        const otp_code = document.getElementById('resetOtp').value;
-        const password = document.getElementById('newPassword').value;
-        const password_confirmation = document.getElementById('newPasswordConfirmation').value;
-        const errorBox = document.getElementById('step3Error');
-        errorBox.classList.add('hidden');
-
-        if (!password || password.length < 8) {
-            errorBox.textContent = 'Password must be at least 8 characters long.';
-            errorBox.classList.remove('hidden');
-            return;
-        }
-
-        if (password !== password_confirmation) {
-            errorBox.textContent = 'Passwords do not match.';
-            errorBox.classList.remove('hidden');
-            return;
-        }
-
-        try {
-            const response = await fetch("{{ route('password.otp.reset') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ email, otp_code, password, password_confirmation })
-            });
-            const data = await response.json();
-
-            if (response.ok) {
-                document.getElementById('forgotStep3').classList.add('hidden');
-                document.getElementById('forgotStep4').classList.remove('hidden');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 3000);
-            } else {
-                errorBox.textContent = data.message || 'Failed to reset password.';
-                errorBox.classList.remove('hidden');
-            }
-        } catch (e) {
-            errorBox.textContent = 'Connection error. Please try again.';
-            errorBox.classList.remove('hidden');
-        }
-    }
-
-    // --- 6-Slot OTP Interactive Logic & Ready/Checking Animation (Matched to login page) ---
     (function () {
         const slots = Array.from(document.querySelectorAll('.otp-slot'));
         const hiddenOtp = document.getElementById('resetOtp');
@@ -834,5 +752,93 @@
             setTimeout(() => slots.forEach(s => s.classList.remove('error')), 400);
         };
     })();
+
+    async function verifyOtpRequest() {
+        const email = document.getElementById('resetEmail').value;
+        const otp_code = document.getElementById('resetOtp').value;
+        const errorBox = document.getElementById('step2Error');
+        errorBox.classList.add('hidden');
+
+        if (!otp_code || otp_code.length !== 6) {
+            errorBox.textContent = 'Please enter the valid 6-digit code.';
+            errorBox.classList.remove('hidden');
+            if (window.markOtpError) markOtpError();
+            return;
+        }
+
+        try {
+            const response = await fetch("{{ route('password.otp.verify') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email, otp_code })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                document.getElementById('forgotStep2').classList.add('hidden');
+                document.getElementById('forgotStep3').classList.remove('hidden');
+            } else {
+                errorBox.textContent = data.message || 'Invalid or expired verification code.';
+                errorBox.classList.remove('hidden');
+                if (window.markOtpError) markOtpError();
+            }
+        } catch (e) {
+            errorBox.textContent = 'Connection error. Please try again.';
+            errorBox.classList.add('hidden');
+            if (window.markOtpError) markOtpError();
+        }
+    }
+
+    async function resetPasswordRequest() {
+        const email = document.getElementById('resetEmail').value;
+        const otp_code = document.getElementById('resetOtp').value;
+        const password = document.getElementById('newPassword').value;
+        const password_confirmation = document.getElementById('newPasswordConfirmation').value;
+        const errorBox = document.getElementById('step3Error');
+        errorBox.classList.add('hidden');
+
+        if (!password || password.length < 8) {
+            errorBox.textContent = 'Password must be at least 8 characters long.';
+            errorBox.classList.add('hidden');
+            return;
+        }
+
+        if (password !== password_confirmation) {
+            errorBox.textContent = 'Passwords do not match.';
+            errorBox.classList.add('hidden');
+            return;
+        }
+
+        try {
+            const response = await fetch("{{ route('password.otp.reset') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email, otp_code, password, password_confirmation })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                document.getElementById('forgotStep3').classList.add('hidden');
+                document.getElementById('forgotStep4').classList.remove('hidden');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+            } else {
+                errorBox.textContent = data.message || 'Failed to reset password.';
+                errorBox.classList.add('hidden');
+            }
+        } catch (e) {
+            errorBox.textContent = 'Connection error. Please try again.';
+            errorBox.classList.add('hidden');
+        }
+    }
 </script>
-@endpush[cite: 14]
+@endpush
