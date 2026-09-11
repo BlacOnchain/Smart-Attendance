@@ -42,6 +42,7 @@ Route::post('/login', function (Request $request) {
         LoginActivity::create([
             'user_id' => $user->id,
             'ip_address' => $ip,
+            'location' => LoginActivity::locateIp($ip),
             'user_agent' => $request->userAgent(),
             'session_id' => $request->session()->getId(),
             'logged_in_at' => now(),
@@ -92,6 +93,7 @@ Route::post('/lecturer/login', function (Request $request) {
             LoginActivity::create([
                 'user_id' => $user->id,
                 'ip_address' => $ip,
+                'location' => LoginActivity::locateIp($ip),
                 'user_agent' => $request->userAgent(),
                 'session_id' => $request->session()->getId(),
                 'logged_in_at' => now(),
