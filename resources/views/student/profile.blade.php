@@ -51,6 +51,12 @@
     .otp-status.checking { color: var(--brand-dark); animation: statusIn .35s ease both; }
     @keyframes statusIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
+    @keyframes scaleUp {
+        0% { opacity: 0; transform: scale(0.94); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    .animate-scale-up { animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
     .profile-card {
         background: rgba(255,255,255,0.82);
         border: 1px solid rgba(255,255,255,0.95);
@@ -359,7 +365,7 @@
 
 <!-- Password Confirmation Modal for Profile Update -->
 <div id="passwordModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4" style="background: rgba(16,32,26,0.45); backdrop-filter: blur(6px);">
-    <div class="w-full max-w-md rounded-[28px] bg-white p-6 shadow-2xl border" style="border-color: var(--line)">
+    <div class="w-full max-w-md rounded-[28px] bg-white p-6 shadow-2xl border animate-scale-up" style="border-color: var(--line)">
         <h3 class="text-lg font-semibold" style="color: var(--ink)">Confirm password</h3>
         <p class="mt-2 text-sm" style="color: #7a8580">Type your current password to save these changes securely.</p>
 
@@ -378,7 +384,7 @@
 
 <!-- FORGOT / CHANGE PASSWORD MODAL OVERLAY -->
 <div id="forgotModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4" style="background: rgba(16,32,26,0.45); backdrop-filter: blur(6px);">
-    <div class="w-full max-w-md rounded-[32px] p-8 shadow-2xl bg-white border" style="border-color: var(--line); color: var(--ink);">
+    <div class="w-full max-w-md rounded-[32px] p-8 shadow-2xl bg-white border animate-scale-up" style="border-color: var(--line); color: var(--ink);">
 
         <!-- Step 1: Confirm Email (Pre-filled with user's email) -->
         <div id="forgotStep1">
@@ -829,4 +835,4 @@
         };
     })();
 </script>
-@endpush
+@endpush[cite: 14]
