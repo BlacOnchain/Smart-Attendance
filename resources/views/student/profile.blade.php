@@ -2,13 +2,13 @@
 
 @section('content')
 <style>
-    /* OTP slot inputs — light glass theme, matching the rest of the site */
+    /* OTP slot inputs — exact clean style from the login page */
     .otp-slot {
         width: 44px;
         height: 54px;
         border-radius: 14px;
         background: rgba(255,255,255,0.75);
-        border: 1px solid #d7dbd2;
+        border: 1px solid var(--line);
         color: var(--ink);
         font-family: 'IBM Plex Mono', monospace;
         font-size: 20px;
@@ -17,6 +17,10 @@
         outline: none;
         transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     }
+    @media (max-width: 380px) {
+        .otp-slot { width: 38px; height: 48px; font-size: 18px; border-radius: 11px; }
+        #otpSlotRow { gap: 6px; }
+    }
     .otp-slot:focus {
         border-color: rgba(5,150,105,0.6);
         box-shadow: 0 0 0 4px rgba(5,150,105,0.14);
@@ -24,7 +28,13 @@
     .otp-slot.filled {
         border-color: rgba(5,150,105,0.5);
         background: rgba(5,150,105,0.08);
+        animation: otpPop .28s cubic-bezier(.16,1,.3,1);
     }
+    .otp-slot.ready { border-color: rgba(5,150,105,0.7); background: rgba(5,150,105,0.13); color: #047857; }
+    .otp-slot.checking { animation: otpCheck .55s ease both; }
+    @keyframes otpPop { from { transform: scale(.82); opacity: .55; } to { transform: scale(1); opacity: 1; } }
+    @keyframes otpCheck { 0% { transform: translateY(0); } 45% { transform: translateY(-7px); } 100% { transform: translateY(0); } }
+    
     .otp-slot.error {
         border-color: rgba(190,18,60,0.7);
         animation: otpShake 0.4s ease;
@@ -37,35 +47,9 @@
         80% { transform: translateX(4px); }
     }
 
-    /* Orbit collapse verification animation */
-    .orbit {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
-    }
-    .orbit-ring {
-        width: 110px;
-        height: 110px;
-        fill: none;
-        stroke: rgba(5,150,105,0.45);
-        stroke-width: 1.5;
-        stroke-dasharray: 2 6;
-        animation: orbitSpin 2.4s linear infinite;
-    }
-    @keyframes orbitSpin {
-        to { transform: rotate(360deg); }
-    }
-    .orbit_hub {
-        position: absolute;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: var(--brand);
-        box-shadow: 0 0 18px 4px rgba(5,150,105,0.45);
-    }
+    .otp-status { min-height: 18px; transition: opacity .2s ease, transform .2s ease; }
+    .otp-status.checking { color: var(--brand-dark); animation: statusIn .35s ease both; }
+    @keyframes statusIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
     .profile-card {
         background: rgba(255,255,255,0.82);
@@ -191,7 +175,7 @@
             </button>
         </div>
 
-        <!-- Recent Sign-ins (With "Log out of session" button beside each item) -->
+        <!-- Recent Sign-ins -->
         <div class="pt-4 border-t" style="border-color: var(--line)">
             <div class="flex items-center justify-between mb-4">
                 <h4 class="eyebrow">Recent sign-ins</h4>
@@ -417,8 +401,8 @@
             </div>
         </div>
 
-        <!-- Step 2: Enter OTP Code with Orbit Animation -->
-        <div id="forgotStep2" class="hidden text-center">
+        <!-- Step 2: Enter OTP Code with Clean Ready/Checking Animation -->
+        <div id="forgotStep2" class="hidden">
             <div class="flex items-center justify-between mb-2">
                 <h3 class="text-2xl font-bold">Enter verification code</h3>
                 <button onclick="closeForgotModal()" class="text-lg font-bold" style="color: #9aa39c">✕</button>
@@ -427,8 +411,8 @@
 
             <div id="step2Error" class="hidden mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-sm text-rose-700 text-left"></div>
 
-            <div class="relative flex items-center justify-center py-6" style="min-height: 90px;">
-                <div id="otpSlotRow" class="flex items-center justify-center gap-2.5">
+            <div class="flex flex-col items-center justify-center py-5" style="min-height: 90px;">
+                <div id="otpSlotRow" class="flex items-center justify-center gap-2.5" data-checking="false">
                     <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="0" autocomplete="one-time-code">
                     <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="1">
                     <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="2">
@@ -436,12 +420,7 @@
                     <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="4">
                     <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="5">
                 </div>
-                <div class="orbit hidden" id="otpOrbit">
-                    <svg class="orbit-ring" viewBox="0 0 110 110">
-                        <circle cx="55" cy="55" r="46" vector-effect="non-scaling-stroke" />
-                    </svg>
-                    <span class="orbit_hub" id="orbitHub"></span>
-                </div>
+                <p id="otpStatus" class="otp-status mt-4 text-xs text-neutral-400">Enter all 6 digits</p>
             </div>
             <input type="hidden" id="resetOtp">
         </div>
@@ -675,6 +654,7 @@
         if (!otp_code || otp_code.length !== 6) {
             errorBox.textContent = 'Please enter the valid 6-digit code.';
             errorBox.classList.remove('hidden');
+            if (window.markOtpError) window.markOtpError();
             return;
         }
 
@@ -753,12 +733,12 @@
         }
     }
 
-    // --- 6-Slot OTP Interactive Logic & Orbit Animation ---
+    // --- 6-Slot OTP Interactive Logic & Ready/Checking Animation (Matched to login page) ---
     (function () {
         const slots = Array.from(document.querySelectorAll('.otp-slot'));
         const hiddenOtp = document.getElementById('resetOtp');
         const slotRow = document.getElementById('otpSlotRow');
-        const orbit = document.getElementById('otpOrbit');
+        const status = document.getElementById('otpStatus');
 
         function syncHidden() {
             if (hiddenOtp) hiddenOtp.value = slots.map(s => s.value).join('');
@@ -768,12 +748,15 @@
             slot.addEventListener('input', () => {
                 slot.value = slot.value.replace(/[^0-9]/g, '').slice(0, 1);
                 slot.classList.toggle('filled', slot.value !== '');
+                slot.classList.remove('ready');
                 syncHidden();
+
                 if (slot.value && i < slots.length - 1) {
                     slots[i + 1].focus();
                 }
+
                 if (slots.every(s => s.value !== '')) {
-                    playOrbitCollapse();
+                    verifyWithAnimation();
                 }
             });
 
@@ -794,61 +777,56 @@
                 });
                 syncHidden();
                 if (pasted.length === 6) {
-                    playOrbitCollapse();
+                    verifyWithAnimation();
                 } else if (slots[pasted.length]) {
                     slots[pasted.length].focus();
                 }
             });
         });
 
-        function playOrbitCollapse() {
-            const hub = document.getElementById('orbitHub');
-            if (orbit) orbit.classList.remove('hidden');
-            if (hub) {
-                const hRect = hub.getBoundingClientRect();
-                const centerX = hRect.left + hRect.width / 2;
-                const centerY = hRect.top + hRect.height / 2;
-                slots.forEach((slot, i) => {
-                    const rect = slot.getBoundingClientRect();
-                    const dx = centerX - (rect.left + rect.width / 2);
-                    const dy = centerY - (rect.top + rect.height / 2);
-                    slot.animate([
-                        { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
-                        { transform: `translate(${dx * 0.6}px, ${dy * 0.6}px) rotate(220deg)`, opacity: 0.7, offset: 0.6 },
-                        { transform: `translate(${dx}px, ${dy}px) rotate(450deg)`, opacity: 0 },
-                    ], {
-                        duration: 550,
-                        delay: i * 40,
-                        easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
-                        fill: 'forwards',
-                    });
-                });
+        function verifyWithAnimation() {
+            if (slotRow.dataset.checking === 'true') return;
+            slotRow.dataset.checking = 'true';
+            slots.forEach((slot, i) => {
+                slot.classList.add('ready', 'checking');
+                slot.style.animationDelay = `${i * 45}ms`;
+            });
+            if (status) {
+                status.textContent = 'Checking your code...';
+                status.classList.add('checking');
             }
-            setTimeout(() => { if (slotRow) slotRow.style.visibility = 'hidden'; }, 550 + slots.length * 40);
-            setTimeout(() => { verifyOtpRequest(); }, 700 + slots.length * 40);
+            setTimeout(() => { verifyOtpRequest(); }, 520);
         }
 
         window.resetOtpSlots = function () {
             slots.forEach(s => {
                 s.getAnimations().forEach(a => a.cancel());
                 s.value = '';
-                s.classList.remove('filled', 'error');
+                s.classList.remove('filled', 'ready', 'checking', 'error');
+                s.style.animationDelay = '';
             });
-            if (slotRow) slotRow.style.visibility = 'visible';
-            if (orbit) orbit.classList.add('hidden');
+            if (slotRow) slotRow.dataset.checking = 'false';
+            if (status) {
+                status.textContent = 'Enter all 6 digits';
+                status.classList.remove('checking');
+            }
             syncHidden();
             if (slots[0]) slots[0].focus();
         };
 
         window.markOtpError = function () {
-            if (slotRow) slotRow.style.visibility = 'visible';
-            if (orbit) orbit.classList.add('hidden');
+            if (slotRow) slotRow.dataset.checking = 'false';
+            if (status) {
+                status.textContent = 'That code was not accepted. Try again.';
+                status.classList.remove('checking');
+            }
             slots.forEach(s => {
                 s.getAnimations().forEach(a => a.cancel());
+                s.classList.remove('ready', 'checking');
                 s.classList.add('error');
             });
             setTimeout(() => slots.forEach(s => s.classList.remove('error')), 400);
         };
     })();
 </script>
-@endpush[cite: 9]
+@endpush
