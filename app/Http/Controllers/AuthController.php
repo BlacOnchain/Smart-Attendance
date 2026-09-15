@@ -122,12 +122,22 @@ class AuthController extends Controller
     // 1. Send OTP Code to Email
     public function sendOtpCode(Request $request)
     {
-        $request->validate(['email' => 'required|email|exists:users,email']);
+        $request->validate(['email' => ['required', 'email', 'max:255']]);
 
-        $user = User::where('email', $request->email)->first();
+        $email = strtolower(trim($request->email));
+        $user = User::whereRaw('LOWER(email) = ?', [$email])->first();
+
+        // Do not reveal whether an email belongs to an account. This prevents
+        // the reset form from becoming a user-enumeration tool.
+        if (!$user) {
+            return response()->json([
+                'success' => true,
+                'message' => 'If an account exists for that email, a verification code has been sent.',
+            ]);
+        }
 
         // Generate a random 6-digit code
-        $otp = (string) rand(100000, 999999);
+        $otp = (string) random_int(100000, 999999);
 
         $user->otp_code = $otp;
         $user->otp_expires_at = Carbon::now()->addMinutes(10); // Code valid for 10 mins
@@ -137,7 +147,7 @@ class AuthController extends Controller
             // Send the styled HTML email using our Mailable class
             Mail::to($user->email)->send(new SendOtpMail($otp));
 
-            return response()->json(['success' => true, 'message' => 'Verification code sent to your email!']);
+            return response()->json(['success' => true, 'message' => 'If an account exists for that email, a verification code has been sent.']);
         } catch (\Exception $e) {
             // Previously this returned $e->getMessage() straight to the
             // client, which can leak mail server hostnames, credentials

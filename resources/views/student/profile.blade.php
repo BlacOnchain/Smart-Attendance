@@ -48,6 +48,8 @@
     }
 
     .otp-status { min-height: 18px; transition: opacity .2s ease, transform .2s ease; }
+    .password-meter { height: 6px; border-radius: 999px; background: #e8f1eb; overflow: hidden; }
+    .password-meter span { display: block; height: 100%; width: 0; border-radius: inherit; transition: width .25s ease, background-color .25s ease; }
     .otp-status.checking { color: var(--brand-dark); animation: statusIn .35s ease both; }
     @keyframes statusIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
@@ -445,11 +447,12 @@
             <div class="space-y-4">
                 <div>
                     <label class="field-label">New password</label>
-                    <input type="password" id="newPassword" required placeholder="••••••••" class="glass-input w-full rounded-2xl px-4 py-3">
+                    <div class="relative"><input type="password" id="newPassword" required minlength="8" autocomplete="new-password" placeholder="Create a strong password" class="glass-input w-full rounded-2xl px-4 py-3 pr-12"><button type="button" onclick="toggleProfilePassword('newPassword', 'profileEye1')" class="absolute inset-y-0 right-0 px-4 text-slate-500" aria-label="Show new password"><span id="profileEye1">Show</span></button></div>
+                    <div class="password-meter mt-2"><span id="profilePasswordMeter"></span></div><p id="profilePasswordHint" class="mt-1 text-[11px] text-slate-500">Use at least 8 characters.</p>
                 </div>
                 <div>
                     <label class="field-label">Confirm new password</label>
-                    <input type="password" id="newPasswordConfirmation" required placeholder="••••••••" class="glass-input w-full rounded-2xl px-4 py-3">
+                    <div class="relative"><input type="password" id="newPasswordConfirmation" required minlength="8" autocomplete="new-password" placeholder="Repeat your password" class="glass-input w-full rounded-2xl px-4 py-3 pr-12"><button type="button" onclick="toggleProfilePassword('newPasswordConfirmation', 'profileEye2')" class="absolute inset-y-0 right-0 px-4 text-slate-500" aria-label="Show password confirmation"><span id="profileEye2">Show</span></button></div><p id="profileMatchHint" class="mt-1 text-[11px] text-slate-500">Passwords must match.</p>
                 </div>
                 <button type="button" onclick="resetPasswordRequest()" id="resetPassBtn" class="w-full rounded-2xl bg-emerald-600 px-4 py-3.5 font-semibold text-white hover:bg-emerald-700 transition">
                     Update password
@@ -803,13 +806,13 @@
 
         if (!password || password.length < 8) {
             errorBox.textContent = 'Password must be at least 8 characters long.';
-            errorBox.classList.add('hidden');
+            errorBox.classList.remove('hidden');
             return;
         }
 
         if (password !== password_confirmation) {
             errorBox.textContent = 'Passwords do not match.';
-            errorBox.classList.add('hidden');
+            errorBox.classList.remove('hidden');
             return;
         }
 
@@ -833,12 +836,16 @@
                 }, 3000);
             } else {
                 errorBox.textContent = data.message || 'Failed to reset password.';
-                errorBox.classList.add('hidden');
+                errorBox.classList.remove('hidden');
             }
         } catch (e) {
             errorBox.textContent = 'Connection error. Please try again.';
-            errorBox.classList.add('hidden');
+            errorBox.classList.remove('hidden');
         }
     }
+
+    function toggleProfilePassword(id, labelId) { const input = document.getElementById(id); const label = document.getElementById(labelId); const visible = input.type === 'password'; input.type = visible ? 'text' : 'password'; label.textContent = visible ? 'Hide' : 'Show'; }
+    function updateProfilePasswordHints() { const password = document.getElementById('newPassword').value; const confirm = document.getElementById('newPasswordConfirmation').value; const score = [password.length >= 8, /[A-Z]/.test(password), /[0-9]/.test(password), /[^A-Za-z0-9]/.test(password)].filter(Boolean).length; const meter = document.getElementById('profilePasswordMeter'); meter.style.width = `${score * 25}%`; meter.style.backgroundColor = score < 2 ? '#e11d48' : score < 4 ? '#d97706' : '#059669'; const hint = document.getElementById('profilePasswordHint'); hint.textContent = score < 2 ? 'Use 8+ characters with a number or symbol.' : score < 4 ? 'Good start. Add a capital letter and symbol.' : 'Strong password.'; hint.style.color = score < 2 ? '#be123c' : score < 4 ? '#b45309' : '#047857'; const match = document.getElementById('profileMatchHint'); match.textContent = confirm && password === confirm ? 'Passwords match.' : 'Passwords must match.'; match.style.color = confirm && password === confirm ? '#047857' : '#64748b'; }
+    document.getElementById('newPassword')?.addEventListener('input', updateProfilePasswordHints); document.getElementById('newPasswordConfirmation')?.addEventListener('input', updateProfilePasswordHints);
 </script>
 @endpush
