@@ -206,7 +206,6 @@
 <body>
     <div class="relative min-h-screen overflow-hidden">
         <div class="auth-mesh"></div>
-        <div class="grain"></div>
 
         <div class="relative z-10 mx-auto grid min-h-screen max-w-7xl lg:grid-cols-2">
             <!-- Sign-in panel -->

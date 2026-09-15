@@ -263,7 +263,6 @@
 <body class="auth-page">
     <div class="relative min-h-screen overflow-hidden">
         <div class="auth-mesh"></div>
-        <div class="grain"></div>
         <a href="{{ route('home') }}" class="auth-back" aria-label="Back to home">←</a>
 
         <div class="relative z-10 mx-auto grid min-h-screen max-w-7xl lg:grid-cols-2 auth-layout">

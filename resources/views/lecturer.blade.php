@@ -174,7 +174,7 @@
                     <div class="flex items-center gap-4">
                         <button class="btn-nudge rounded-full border border-emerald-200 p-2 text-slate-700 hover:text-emerald-800 bg-white shadow-sm">
                             <span class="sr-only">Notifications</span>
-                            <span class="text-lg">🔔</span>
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
                         </button>
                         <div class="lift-hover hidden items-center gap-3 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 shadow-sm sm:flex hover:bg-emerald-100">
                             @if (Auth::user()->profile_photo_url)
@@ -240,7 +240,7 @@
                             </form>
                         @else
                             <div class="rounded-2xl border border-white/30 bg-white/10 px-4 py-3 text-sm font-semibold text-white">
-                                No courses assigned yet — claim one below to get started.
+                                No courses assigned yet. Claim one below to get started.
                             </div>
                         @endif
                     </div>
@@ -501,7 +501,7 @@
                             </div>
                         @empty
                             <div class="sm:col-span-2 lg:col-span-3 rounded-2xl border border-dashed border-emerald-200 bg-slate-50 p-5 text-center text-sm font-medium text-slate-500">
-                                You have no assigned courses yet — claim one from the list below.
+                                You have no assigned courses yet. Claim one from the list below.
                             </div>
                         @endforelse
                     </div>
@@ -509,7 +509,7 @@
                     @if ($unclaimedCourses->isNotEmpty())
                         <div class="mt-6 border-t border-emerald-100 pt-6">
                             <p class="text-xs uppercase tracking-[0.28em] text-amber-700 font-bold">Unclaimed courses</p>
-                            <p class="mt-1 text-sm text-slate-500">No lecturer assigned yet — claim any of these as your own.</p>
+                            <p class="mt-1 text-sm text-slate-500">No lecturer assigned yet. Claim any of these as your own.</p>
 
                             <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                                 @foreach ($unclaimedCourses as $course)

@@ -65,7 +65,7 @@
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex items-center gap-3">
                         <span class="pulse-attention flex h-9 w-9 items-center justify-center rounded-full bg-amber-500 text-white">!</span>
-                        <p class="text-sm font-semibold text-slate-900">{{ $activeSession->course_code }} is live — you haven't checked in</p>
+                        <p class="text-sm font-semibold text-slate-900">{{ $activeSession->course_code }} is live. You have not checked in.</p>
                     </div>
                     <a href="{{ route('student.camera') }}" class="btn-nudge inline-flex items-center justify-center rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 whitespace-nowrap">
                         Check in now
@@ -281,7 +281,7 @@
                 </div>
             @empty
                 <div class="md:col-span-2 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/20 p-5 text-center text-sm text-slate-500">
-                    No courses enrolled yet — set them up in your profile.
+                    No courses enrolled yet. Set them up in your profile.
                 </div>
             @endforelse
         </div>

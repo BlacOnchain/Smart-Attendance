@@ -173,17 +173,17 @@
         .auth-form-pane p[style] { color: #a6a8b1 !important; }
         .auth-form-pane .field-label { color: #9b9da6; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
         .auth-form-pane .glass-input { border: 0; border-bottom: 1px solid #4a4b52; border-radius: 0; background: transparent; color: #f8fafc; box-shadow: none; padding-left: 0; }
-        .auth-form-pane .glass-input:focus { border-bottom-color: #a56be8; box-shadow: 0 2px 0 #a56be8; background: transparent; }
+        .auth-form-pane .glass-input:focus { border-bottom-color: #34d399; box-shadow: 0 2px 0 #34d399; background: transparent; }
         .auth-form-pane .glass-input::placeholder { color: #686a73; }
         .auth-form-pane .input-icon { display: none; }
-        .auth-form-pane .btn-nudge { border-radius: 8px; background: #a56be8; box-shadow: 0 12px 24px rgba(165,107,232,.22); }
-        .auth-form-pane .btn-nudge:hover { background: #9258db; }
-        .auth-form-pane a { color: #c49df4; }
-        .auth-form-pane a:hover { color: #e1ccff; }
+        .auth-form-pane .btn-nudge { border-radius: 8px; background: #059669; box-shadow: 0 12px 24px rgba(5,150,105,.22); }
+        .auth-form-pane .btn-nudge:hover { background: #047857; }
+        .auth-form-pane a { color: #6ee7b7; }
+        .auth-form-pane a:hover { color: #a7f3d0; }
         .auth-form-pane .lift-hover { border-color: #45464d !important; background: transparent !important; color: #d5d6db !important; border-radius: 8px; }
-        .auth-form-pane .lift-hover:hover { border-color: #a56be8 !important; }
-        .auth-form-pane input[type="checkbox"] { accent-color: #a56be8; }
-        .auth-art-pane { display: flex !important; position: relative; overflow: hidden; background: linear-gradient(145deg, #8750d4 0%, #9b62e6 48%, #b27bf0 100%); color: #fff; }
+        .auth-form-pane .lift-hover:hover { border-color: #34d399 !important; }
+        .auth-form-pane input[type="checkbox"] { accent-color: #34d399; }
+        .auth-art-pane { display: flex !important; position: relative; overflow: hidden; background: linear-gradient(145deg, #047857 0%, #059669 48%, #14b8a6 100%); color: #fff; }
         .auth-art-pane::before, .auth-art-pane::after { content: ''; position: absolute; border-radius: 999px; background: rgba(255,255,255,.08); pointer-events: none; }
         .auth-art-pane::before { width: 390px; height: 210px; top: 7%; right: -100px; transform: rotate(-20deg); }
         .auth-art-pane::after { width: 520px; height: 260px; bottom: 7%; left: -170px; transform: rotate(18deg); }
@@ -193,15 +193,15 @@
         .auth-art-pane h2 { color: #fff; max-width: 650px; font-size: clamp(2.7rem, 5vw, 4.7rem); }
         .auth-art-pane h2 span { font-weight: 400; }
         .auth-art-pane p, .auth-art-pane .step-label { color: rgba(255,255,255,.76) !important; }
-        .auth-art-pane .step-num { background: #fff; color: #8750d4; }
+        .auth-art-pane .step-num { background: #fff; color: #047857; }
         .auth-art-pane .step-arrow { color: rgba(255,255,255,.55); }
         .auth-art-visual { display: flex; align-items: center; gap: clamp(1rem, 3vw, 2rem); margin: 1.5rem 0; }
         .auth-visual-orbit { position: relative; display: grid; place-items: center; width: clamp(170px, 22vw, 260px); height: clamp(170px, 22vw, 260px); flex: 0 0 auto; }
         .auth-visual-orbit::before { content: ''; position: absolute; inset: 8%; border: 1px solid rgba(255,255,255,.25); border-radius: 42% 58% 56% 44%; transform: rotate(25deg); }
         .auth-visual-orbit::after { content: ''; position: absolute; inset: 0; border: 1px dashed rgba(255,255,255,.2); border-radius: 50%; transform: rotate(-20deg); }
         .auth-art-visual img { width: 78%; height: 78%; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 24px 24px rgba(44,19,83,.22)); animation: shieldFloat 5s ease-in-out infinite; }
-        .auth-checkmark { position: absolute; z-index: 2; right: 5%; bottom: 10%; display: grid; place-items: center; width: 38px; height: 38px; border: 3px solid #8750d4; border-radius: 50%; background: #fff; color: #1ba978; font-size: 1.35rem; font-weight: 800; }
-        .auth-preview-card { width: min(205px, 42vw); padding: 1rem; border: 1px solid rgba(255,255,255,.22); border-radius: 18px; background: rgba(30,14,60,.2); box-shadow: 0 20px 35px rgba(44,19,83,.14); }
+        .auth-checkmark { position: absolute; z-index: 2; right: 5%; bottom: 10%; display: grid; place-items: center; width: 38px; height: 38px; border: 3px solid #059669; border-radius: 50%; background: #fff; color: #059669; font-size: 1.35rem; font-weight: 800; }
+        .auth-preview-card { width: min(205px, 42vw); padding: 1rem; border: 1px solid rgba(255,255,255,.22); border-radius: 18px; background: rgba(4,78,55,.2); box-shadow: 0 20px 35px rgba(4,78,55,.14); }
         .auth-preview-card p { margin: 0; color: rgba(255,255,255,.7) !important; font-size: .73rem; }
         .auth-preview-card strong { display: block; margin: .3rem 0 .6rem; color: #fff; font-size: 2rem; line-height: 1; }
         .auth-progress { height: 7px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.2); }
@@ -249,7 +249,6 @@
 <body class="auth-page">
     <div class="relative min-h-screen overflow-hidden">
         <div class="auth-mesh"></div>
-        <div class="grain"></div>
 
         <a href="{{ route('home') }}" class="auth-back" aria-label="Back to home">←</a>
         <div class="relative z-10 mx-auto grid min-h-screen max-w-7xl lg:grid-cols-2 auth-layout">

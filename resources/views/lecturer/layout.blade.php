@@ -173,7 +173,7 @@
                     <div class="flex items-center gap-3">
                         <div class="relative">
                             <button id="lecturerNotificationButton" type="button" onclick="toggleLecturerNotifications()" class="btn-nudge relative rounded-full border bg-white/70 p-2.5 text-slate-700 shadow-sm hover:text-emerald-800" style="border-color: var(--line)" aria-label="Open notifications" aria-expanded="false" aria-controls="lecturerNotificationMenu">
-                                <span class="sr-only">Notifications</span><span class="text-lg">🔔</span><span class="absolute right-1 top-1 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+                                <span class="sr-only">Notifications</span><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="absolute right-1 top-1 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
                             </button>
                             <div id="lecturerNotificationMenu" class="absolute right-0 top-14 z-50 hidden w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border bg-white shadow-2xl" style="border-color: var(--line)">
                                 <div class="border-b px-4 py-4" style="border-color: var(--line)"><p class="text-sm font-bold">Lecturer notifications</p><p class="text-xs text-slate-500">Important department updates</p></div>
