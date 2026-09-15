@@ -211,16 +211,75 @@
         .password-meter span { display: block; height: 100%; width: 0; border-radius: inherit; transition: width .25s ease, background-color .25s ease; }
         .otp-status.checking { color: var(--brand-dark); animation: statusIn .35s ease both; }
         @keyframes statusIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+        /* Split auth treatment based on the supplied reference. */
+        body.auth-page { background: #f6f6f4; color: #f8fafc; }
+        .auth-layout { max-width: none; }
+        .auth-back { position: fixed; z-index: 30; top: 18px; left: 20px; display: grid; place-items: center; width: 62px; height: 62px; border-radius: 0 0 18px 0; background: #fff; color: #111827; font-size: 38px; line-height: 1; box-shadow: 0 8px 22px rgba(15,23,42,.08); transition: transform .2s ease; }
+        .auth-back:hover { transform: translateX(-3px); }
+        .auth-form-pane { background: #191a1f; color: #f8fafc; }
+        .auth-form-pane > div { max-width: 470px; }
+        .auth-form-pane .glass-panel { background: transparent; border: 0; box-shadow: none; backdrop-filter: none; padding: 0 !important; overflow: visible; }
+        .auth-form-pane .glass-panel::before { display: none; }
+        .auth-form-pane .tag-badge { color: #a8aab4; background: transparent; border: 0; padding: 0; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: .22em; }
+        .auth-form-pane .tag-badge::before { display: none; }
+        .auth-form-pane h2 { color: #f8fafc; font-size: clamp(2rem, 5vw, 3rem); }
+        .auth-form-pane .field-label { color: #9b9da6; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+        .auth-form-pane .glass-input { border: 0; border-bottom: 1px solid #4a4b52; border-radius: 0; background: transparent; color: #f8fafc; box-shadow: none; padding-left: 0; }
+        .auth-form-pane .glass-input:focus { border-bottom-color: #a56be8; box-shadow: 0 2px 0 #a56be8; background: transparent; }
+        .auth-form-pane .glass-input::placeholder { color: #686a73; }
+        .auth-form-pane .input-icon { display: none; }
+        .auth-form-pane .btn-nudge { border-radius: 8px; background: #a56be8; box-shadow: 0 12px 24px rgba(165,107,232,.22); }
+        .auth-form-pane .btn-nudge:hover { background: #9258db; }
+        .auth-form-pane a { color: #c49df4; }
+        .auth-form-pane a:hover { color: #e1ccff; }
+        .auth-form-pane .lift-hover { border-color: #45464d !important; background: transparent !important; color: #d5d6db !important; border-radius: 8px; }
+        .auth-form-pane .lift-hover:hover { border-color: #a56be8 !important; }
+        .auth-form-pane input[type="checkbox"] { accent-color: #a56be8; }
+        .auth-art-pane { display: flex !important; position: relative; overflow: hidden; background: linear-gradient(145deg, #8750d4 0%, #9b62e6 48%, #b27bf0 100%); color: #fff; }
+        .auth-art-pane::before, .auth-art-pane::after { content: ''; position: absolute; border-radius: 999px; background: rgba(255,255,255,.08); pointer-events: none; }
+        .auth-art-pane::before { width: 390px; height: 210px; top: 7%; right: -100px; transform: rotate(-20deg); }
+        .auth-art-pane::after { width: 520px; height: 260px; bottom: 7%; left: -170px; transform: rotate(18deg); }
+        .auth-art-pane > * { position: relative; z-index: 1; }
+        .auth-art-pane .tag-badge { color: rgba(255,255,255,.78); background: transparent; border: 0; padding: 0; }
+        .auth-art-pane .tag-badge::before { background: #fff; }
+        .auth-art-pane h2 { color: #fff; max-width: 650px; font-size: clamp(2.7rem, 5vw, 4.7rem); }
+        .auth-art-pane h2 span { font-weight: 400; }
+        .auth-art-pane p, .auth-art-pane .step-label { color: rgba(255,255,255,.76) !important; }
+        .auth-art-pane .step-num { background: #fff; color: #8750d4; }
+        .auth-art-pane .step-arrow { color: rgba(255,255,255,.55); }
+        .auth-art-visual { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
+        .auth-art-visual img { width: clamp(150px, 20vw, 250px); height: clamp(150px, 20vw, 250px); object-fit: contain; filter: drop-shadow(0 24px 24px rgba(44,19,83,.22)); animation: shieldFloat 5s ease-in-out infinite; }
+        .auth-art-visual span { max-width: 150px; color: rgba(255,255,255,.88); font-size: .95rem; line-height: 1.5; }
+        @keyframes shieldFloat { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(2deg); } }
+        .auth-art-pane .glass-panel, .auth-art-pane .glass-chip { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.18); box-shadow: none; color: #fff; }
+        .auth-art-pane .glass-panel::before { display: none; }
+        .auth-art-pane .chip-icon { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.2); color: #fff; }
+        .auth-art-pane .glass-chip p, .auth-art-pane .glass-panel p { color: rgba(255,255,255,.75) !important; }
+        @media (max-width: 1023px) {
+            .auth-layout { display: flex; flex-direction: column; }
+            .auth-form-pane { min-height: 100svh; padding-top: 6.2rem !important; }
+            .auth-art-pane { min-height: 360px; padding: 3.5rem 1.5rem !important; }
+            .auth-art-pane .text-5xl { font-size: 2.4rem; }
+            .auth-art-pane .grid { display: none; }
+            .auth-art-visual { margin-top: 2rem; }
+        }
+        @media (max-width: 520px) {
+            .auth-back { width: 54px; height: 54px; top: 0; left: 8px; font-size: 32px; }
+            .auth-form-pane { padding-left: 1.35rem !important; padding-right: 1.35rem !important; }
+            .auth-art-visual img { width: 135px; height: 135px; }
+        }
     </style>
 </head>
-<body>
+<body class="auth-page">
     <div class="relative min-h-screen overflow-hidden">
         <div class="auth-mesh"></div>
         <div class="grain"></div>
 
-        <div class="relative z-10 mx-auto grid min-h-screen max-w-7xl lg:grid-cols-2">
+        <a href="{{ route('home') }}" class="auth-back" aria-label="Back to home">←</a>
+        <div class="relative z-10 mx-auto grid min-h-screen max-w-7xl lg:grid-cols-2 auth-layout">
             <!-- Sign-in panel -->
-            <section class="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-12" style="padding-top: max(2.5rem, env(safe-area-inset-top)); padding-bottom: max(2.5rem, env(safe-area-inset-bottom));">
+            <section class="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-12 auth-form-pane" style="padding-top: max(2.5rem, env(safe-area-inset-top)); padding-bottom: max(2.5rem, env(safe-area-inset-bottom));">
                 <div class="w-full max-w-md">
                     <div class="anim-rise mb-8 flex items-center gap-3" style="--d: 0s">
                         <img src="{{ asset('images/logo-3d.svg') }}" alt="Smart Attendance logo" class="h-11 w-11 rounded-xl object-cover">
@@ -296,12 +355,12 @@
             </section>
 
             <!-- Marketing side -->
-            <aside class="hidden lg:flex lg:flex-col lg:justify-between lg:px-14 lg:py-14">
+            <aside class="hidden lg:flex lg:flex-col lg:justify-between lg:px-14 lg:py-14 auth-art-pane">
                 <div class="anim-slide-left max-w-xl" style="--d: 0.12s">
                     <span class="tag-badge">Smart Attendance</span>
-                    <h2 class="mt-6 text-5xl font-bold leading-tight tracking-tight">One QR code, one classroom, no proxy sign-ins.</h2>
+                    <h2 class="mt-6 text-5xl font-bold leading-tight tracking-tight">Welcome to<br><span>student portal</span></h2>
                     <p class="mt-5 text-lg leading-8" style="color:#4b564f">
-                        Your dashboard, timetable, and course registration in one place — check in with a scan and see exactly what you're enrolled in.
+                        Sign in to access your timetable, courses, and secure attendance check-ins.
                     </p>
                     <div class="step-row anim-slide-left mt-6" style="--d: 0.14s">
                         <span class="step-num">1</span><span class="step-label">Scan</span>
@@ -310,6 +369,11 @@
                         <span class="step-arrow">→</span>
                         <span class="step-num">3</span><span class="step-label">Done</span>
                     </div>
+                </div>
+
+                <div class="auth-art-visual anim-scale" style="--d: 0.18s">
+                    <img src="{{ asset('images/logo-3d-512.png') }}" alt="Smart Attendance shield" loading="eager">
+                    <span>Secure attendance, beautifully simple.</span>
                 </div>
 
                 <div class="anim-scale glass-panel rounded-2xl p-5 flex items-center gap-3 max-w-sm" style="--d: 0.16s">
