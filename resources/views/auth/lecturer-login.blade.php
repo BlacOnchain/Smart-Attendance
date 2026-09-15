@@ -199,6 +199,8 @@
             80% { transform: translateX(4px); }
         }
         .otp-status { min-height: 18px; transition: opacity .2s ease, transform .2s ease; }
+        .password-meter { height: 6px; border-radius: 999px; background: #e8f1eb; overflow: hidden; }
+        .password-meter span { display: block; height: 100%; width: 0; border-radius: inherit; transition: width .25s ease, background-color .25s ease; }
         .otp-status.checking { color: var(--brand-dark); animation: statusIn .35s ease both; }
         @keyframes statusIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
     </style>
@@ -367,7 +369,6 @@
                             <input type="text" inputmode="numeric" maxlength="1" class="otp-slot" data-otp-slot="5">
                         </div>
 
-                        </div>
                         <p id="otpStatus" class="otp-status mt-4 text-xs text-neutral-400">Enter all 6 digits</p>
                     </div>
 
@@ -380,18 +381,19 @@
                         <h3 class="text-2xl font-bold">New password</h3>
                         <button onclick="closeForgotModal()" class="text-lg font-bold" style="color:#9aa39c">✕</button>
                     </div>
-                    <p class="text-sm mb-6" style="color:#5b6660">Create a secure new password for your lecturer account.</p>
+                    <p class="text-sm mb-5" style="color:#5b6660">Use 8 or more characters. A capital letter, number, and symbol make it stronger.</p>
 
                     <div id="step3Error" class="hidden mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700"></div>
 
                     <div class="space-y-4">
                         <div>
                             <label class="field-label">New password</label>
-                            <input type="password" id="newPassword" required placeholder="••••••••" class="glass-input w-full rounded-2xl px-4 py-3">
+                            <div class="relative"><input type="password" id="newPassword" required minlength="8" autocomplete="new-password" placeholder="Create a strong password" class="glass-input w-full rounded-2xl px-4 py-3 pr-12"><button type="button" onclick="toggleNewPassword('newPassword', 'newEye1')" class="absolute inset-y-0 right-0 px-4 text-slate-500" aria-label="Show new password"><span id="newEye1">Show</span></button></div>
+                            <div class="password-meter mt-2"><span id="resetPasswordMeter"></span></div><p id="resetPasswordHint" class="mt-1 text-[11px] text-slate-500">Use at least 8 characters.</p>
                         </div>
                         <div>
                             <label class="field-label">Confirm new password</label>
-                            <input type="password" id="newPasswordConfirmation" required placeholder="••••••••" class="glass-input w-full rounded-2xl px-4 py-3">
+                            <div class="relative"><input type="password" id="newPasswordConfirmation" required minlength="8" autocomplete="new-password" placeholder="Repeat your password" class="glass-input w-full rounded-2xl px-4 py-3 pr-12"><button type="button" onclick="toggleNewPassword('newPasswordConfirmation', 'newEye2')" class="absolute inset-y-0 right-0 px-4 text-slate-500" aria-label="Show password confirmation"><span id="newEye2">Show</span></button></div><p id="resetMatchHint" class="mt-1 text-[11px] text-slate-500">Passwords must match.</p>
                         </div>
                         <button type="button" onclick="resetPasswordRequest()" id="resetPassBtn" class="w-full rounded-2xl px-4 py-3.5 font-semibold text-white transition" style="background: var(--brand)" onmouseover="this.style.background='var(--brand-dark)'" onmouseout="this.style.background='var(--brand)'">
                             Update password
@@ -599,7 +601,7 @@
                 }
             } catch (e) {
                 errorBox.textContent = 'Connection error. Please try again.';
-                errorBox.classList.add('hidden');
+                errorBox.classList.remove('hidden');
                 if (window.markOtpError) markOtpError();
             }
         }
@@ -620,7 +622,7 @@
 
             if (password !== password_confirmation) {
                 errorBox.textContent = 'Passwords do not match.';
-                errorBox.classList.add('hidden');
+                errorBox.classList.remove('hidden');
                 return;
             }
 
@@ -644,13 +646,17 @@
                     }, 3000);
                 } else {
                     errorBox.textContent = data.message || 'Failed to reset password.';
-                    errorBox.classList.add('hidden');
+                    errorBox.classList.remove('hidden');
                 }
             } catch (e) {
                 errorBox.textContent = 'Connection error. Please try again.';
-                errorBox.classList.add('hidden');
+                errorBox.classList.remove('hidden');
             }
         }
+
+        function toggleNewPassword(id, labelId) { const input = document.getElementById(id); const label = document.getElementById(labelId); const visible = input.type === 'password'; input.type = visible ? 'text' : 'password'; label.textContent = visible ? 'Hide' : 'Show'; }
+        function updateResetPasswordHints() { const password = document.getElementById('newPassword').value; const confirm = document.getElementById('newPasswordConfirmation').value; const score = [password.length >= 8, /[A-Z]/.test(password), /[0-9]/.test(password), /[^A-Za-z0-9]/.test(password)].filter(Boolean).length; const meter = document.getElementById('resetPasswordMeter'); meter.style.width = `${score * 25}%`; meter.style.backgroundColor = score < 2 ? '#e11d48' : score < 4 ? '#d97706' : '#0d9488'; const hint = document.getElementById('resetPasswordHint'); hint.textContent = score < 2 ? 'Use 8+ characters with a number or symbol.' : score < 4 ? 'Good start. Add a capital letter and symbol.' : 'Strong password.'; hint.style.color = score < 2 ? '#be123c' : score < 4 ? '#b45309' : '#0f766e'; const match = document.getElementById('resetMatchHint'); match.textContent = confirm && password === confirm ? 'Passwords match.' : 'Passwords must match.'; match.style.color = confirm && password === confirm ? '#0f766e' : '#64748b'; }
+        document.getElementById('newPassword')?.addEventListener('input', updateResetPasswordHints); document.getElementById('newPasswordConfirmation')?.addEventListener('input', updateResetPasswordHints);
     </script>
 </body>
 </html>

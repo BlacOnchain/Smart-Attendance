@@ -225,7 +225,7 @@
                                 <div>
                                     <label class="field-label" for="passwordInput">Password</label>
                                     <div class="relative">
-                                        <input type="password" id="passwordInput" name="password" required placeholder="••••••••"
+                                        <input type="password" id="passwordInput" name="password" required minlength="8" autocomplete="new-password" placeholder="Create a strong password"
                                                class="glass-input w-full rounded-2xl px-4 py-3 pr-11">
                                         <button type="button" onclick="togglePassword('passwordInput', 'eyeIcon1')" class="absolute inset-y-0 right-0 flex items-center pr-3.5 hover:opacity-70" style="color:#7a8580" aria-label="Toggle password visibility">
                                             <svg id="eyeIcon1" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -240,7 +240,7 @@
                                 <div>
                                     <label class="field-label" for="passwordConfirmInput">Confirm password</label>
                                     <div class="relative">
-                                        <input type="password" id="passwordConfirmInput" name="password_confirmation" required placeholder="••••••••"
+                                        <input type="password" id="passwordConfirmInput" name="password_confirmation" required minlength="8" autocomplete="new-password" placeholder="Repeat your password"
                                                class="glass-input w-full rounded-2xl px-4 py-3 pr-11">
                                         <button type="button" onclick="togglePassword('passwordConfirmInput', 'eyeIcon2')" class="absolute inset-y-0 right-0 flex items-center pr-3.5 hover:opacity-70" style="color:#7a8580" aria-label="Toggle password visibility">
                                             <svg id="eyeIcon2" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -252,6 +252,8 @@
                                     <p id="passwordMatchHint" class="password-hint mt-1">Passwords must match.</p>
                                 </div>
                             </div>
+
+                            <div class="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs leading-5 text-emerald-900"><strong>Security check:</strong> use a unique password with 8+ characters, a capital letter, a number, and a symbol.</div>
 
                             <label class="flex items-center gap-2 pt-1 text-sm" style="color:#5b6660">
                                 <input type="checkbox" required class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
