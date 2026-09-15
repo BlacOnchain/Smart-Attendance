@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Attendance | Lecturer Portal</title>
     <meta name="description" content="Lecturer portal for opening QR attendance sessions, managing courses, and reviewing student check-ins.">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" href="{{ asset('favicon-32.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('favicon-192.png') }}">
     <meta property="og:title" content="Smart Attendance | Lecturer Portal">
     <meta property="og:description" content="Open secure attendance sessions and review student check-ins.">
-    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.svg') }}">
+    <meta property="og:image" content="{{ asset('images/logo-3d-512.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">

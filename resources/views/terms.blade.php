@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms and Conditions | Smart Attendance</title>
     <meta name="description" content="Terms and conditions for using the Smart Attendance QR-code attendance system.">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('favicon-32.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('favicon-192.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
@@ -19,7 +20,7 @@
 <body class="min-h-screen">
     <header class="border-b sticky top-0 bg-white/90 backdrop-blur z-10" style="border-color: var(--line)">
         <div class="mx-auto max-w-3xl px-6 py-4 flex items-center gap-3">
-            <img src="{{ asset('images/smart-attendance-logo.svg') }}" alt="Smart Attendance logo" class="h-9 w-9 rounded-xl object-cover">
+            <img src="{{ asset('images/logo-3d.svg') }}" alt="Smart Attendance logo" class="h-9 w-9 rounded-xl object-cover">
             <span class="font-semibold">Smart Attendance</span>
         </div>
     </header>

@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Attendance Check-in | Smart Attendance</title>
     <meta name="description" content="Securely check in to your scheduled class using the lecturer's current QR code.">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('favicon-32.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('favicon-192.png') }}">
     <meta property="og:title" content="Attendance Check-in | Smart Attendance">
     <meta property="og:description" content="Check in securely to your current class.">
-    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.svg') }}">
+    <meta property="og:image" content="{{ asset('images/logo-3d-512.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Smart Attendance | Secure QR attendance for schools</title>
     <meta name="description" content="A secure school attendance portal for student timetables, course registration, and lecturer-led QR check-ins.">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" href="{{ asset('favicon-32.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('favicon-192.png') }}">
     <meta property="og:title" content="Smart Attendance | Secure QR attendance for schools">
     <meta property="og:description" content="Students manage their timetable and check in securely while lecturers see attendance live.">
-    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.svg') }}">
+    <meta property="og:image" content="{{ asset('images/logo-3d-512.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -204,7 +204,7 @@
     <header class="nav-glass sticky top-0 z-50 px-6 py-4">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <img src="{{ asset('images/smart-attendance-logo.svg') }}" alt="Smart Attendance logo" class="h-10 w-10 rounded-xl object-cover">
+                <img src="{{ asset('images/logo-3d.svg') }}" alt="Smart Attendance logo" class="h-10 w-10 rounded-xl object-cover">
                 <span class="text-[15px] font-semibold tracking-tight">Smart Attendance</span>
             </div>
             <div class="flex items-center gap-5">

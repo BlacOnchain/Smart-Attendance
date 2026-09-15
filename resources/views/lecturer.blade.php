@@ -107,7 +107,7 @@
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full border-r border-emerald-100 bg-white/80 backdrop-blur-xl lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-72 lg:translate-x-0 lg:flex-col lg:border-b-0 lg:border-r">
             <div class="flex items-center justify-between gap-3 border-b border-emerald-100 px-5 py-5">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('images/smart-attendance-logo.svg') }}" alt="Smart Attendance logo" class="h-11 w-11 rounded-2xl object-cover">
+                    <img src="{{ asset('images/logo-3d.svg') }}" alt="Smart Attendance logo" class="h-11 w-11 rounded-2xl object-cover">
                     <div>
                         <p class="text-xs uppercase tracking-[0.32em] text-emerald-700 font-bold">Smart Attendance</p>
                         <h1 class="text-lg font-bold text-slate-900">Lecturer Portal</h1>

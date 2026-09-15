@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Create Account | Smart Attendance</title>
     <meta name="description" content="Create your student Smart Attendance account and set your level, semester, and courses.">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('favicon-32.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('favicon-192.png') }}">
     <meta property="og:title" content="Create Account | Smart Attendance">
     <meta property="og:description" content="Create a student account for your timetable and attendance.">
-    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.svg') }}">
+    <meta property="og:image" content="{{ asset('images/logo-3d-512.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,7 +169,7 @@
             <section class="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-12" style="padding-top: max(2.5rem, env(safe-area-inset-top)); padding-bottom: max(2.5rem, env(safe-area-inset-bottom));">
                 <div class="w-full max-w-md">
                     <div class="anim-rise mb-8 flex items-center gap-3" style="--d: 0s">
-                        <img src="{{ asset('images/smart-attendance-logo.svg') }}" alt="Smart Attendance logo" class="h-11 w-11 rounded-xl object-cover">
+                        <img src="{{ asset('images/logo-3d.svg') }}" alt="Smart Attendance logo" class="h-11 w-11 rounded-xl object-cover">
                         <span class="text-[15px] font-semibold tracking-tight">Smart Attendance</span>
                     </div>
 

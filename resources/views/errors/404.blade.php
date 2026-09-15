@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page not found | Smart Attendance</title>
     <meta name="description" content="The Smart Attendance page you requested could not be found.">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('favicon-32.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('favicon-192.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@600;700&display=swap" rel="stylesheet">
@@ -22,7 +23,7 @@
 </head>
 <body class="flex items-center justify-center px-4">
     <div class="text-center max-w-md">
-        <img src="{{ asset('images/smart-attendance-logo.svg') }}" alt="Smart Attendance logo" class="mx-auto mb-6 h-14 w-14 rounded-2xl object-cover">
+        <img src="{{ asset('images/logo-3d.svg') }}" alt="Smart Attendance logo" class="mx-auto mb-6 h-14 w-14 rounded-2xl object-cover">
         <p class="mono text-xs font-bold" style="color: var(--brand-dark)">404</p>
         <h1 class="mt-2 text-2xl font-bold">This page doesn't exist</h1>
         <p class="mt-3 text-sm leading-6" style="color: #5b6660">

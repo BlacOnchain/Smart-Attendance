@@ -6,11 +6,11 @@
     <meta name="theme-color" content="#059669">
     <title>Smart Attendance | Student Portal</title>
     <meta name="description" content="Student portal for course registration, personalized timetables, and secure QR attendance check-ins.">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" href="{{ asset('favicon-32.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('favicon-192.png') }}">
     <meta property="og:title" content="Smart Attendance | Student Portal">
     <meta property="og:description" content="Manage your courses, timetable, and attendance in one student portal.">
-    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.svg') }}">
+    <meta property="og:image" content="{{ asset('images/logo-3d-512.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -231,7 +231,7 @@
         <aside id="sidebar" class="glass-panel fixed inset-y-0 left-0 z-40 -translate-x-full overflow-y-auto lg:sticky lg:top-0 lg:flex lg:h-screen lg:translate-x-0 lg:flex-col" style="border-right: 1px solid var(--line);">
             <div class="flex items-center justify-between gap-3 px-5 py-5" style="border-bottom: 1px solid var(--line); padding-top: max(1.25rem, env(safe-area-inset-top));">
                 <div class="flex min-w-0 items-center gap-3">
-                    <img src="{{ asset('images/smart-attendance-logo.svg') }}" alt="Smart Attendance logo" class="h-11 w-11 shrink-0 rounded-2xl object-cover">
+                    <img src="{{ asset('images/logo-3d.svg') }}" alt="Smart Attendance logo" class="h-11 w-11 shrink-0 rounded-2xl object-cover">
                     <div class="min-w-0">
                         <p class="mono truncate text-[11px] font-semibold" style="color: var(--brand-dark)">Smart Attendance</p>
                         <h1 class="truncate text-lg font-bold" style="color: var(--ink)">Student Portal</h1>
