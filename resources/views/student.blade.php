@@ -231,12 +231,7 @@
         <aside id="sidebar" class="glass-panel fixed inset-y-0 left-0 z-40 -translate-x-full overflow-y-auto lg:sticky lg:top-0 lg:flex lg:h-screen lg:translate-x-0 lg:flex-col" style="border-right: 1px solid var(--line);">
             <div class="flex items-center justify-between gap-3 px-5 py-5" style="border-bottom: 1px solid var(--line); padding-top: max(1.25rem, env(safe-area-inset-top));">
                 <div class="flex min-w-0 items-center gap-3">
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2L20 6.5V17.5L12 22L4 17.5V6.5L12 2Z"/>
-                            <path d="M9.5 12.5L11.3 14.3L15 10.2"/>
-                        </svg>
-                    </div>
+                    <img src="{{ asset('images/smart-attendance-logo.png') }}" alt="Smart Attendance logo" class="h-11 w-11 shrink-0 rounded-2xl object-cover">
                     <div class="min-w-0">
                         <p class="mono truncate text-[11px] font-semibold" style="color: var(--brand-dark)">Smart Attendance</p>
                         <h1 class="truncate text-lg font-bold" style="color: var(--ink)">Student Portal</h1>

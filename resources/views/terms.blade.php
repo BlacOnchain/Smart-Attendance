@@ -19,11 +19,7 @@
 <body class="min-h-screen">
     <header class="border-b sticky top-0 bg-white/90 backdrop-blur z-10" style="border-color: var(--line)">
         <div class="mx-auto max-w-3xl px-6 py-4 flex items-center gap-3">
-            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L20 6.5V17.5L12 22L4 17.5V6.5L12 2Z"/><path d="M9.5 12.5L11.3 14.3L15 10.2"/>
-                </svg>
-            </div>
+            <img src="{{ asset('images/smart-attendance-logo.png') }}" alt="Smart Attendance logo" class="h-9 w-9 rounded-xl object-cover">
             <span class="font-semibold">Smart Attendance</span>
         </div>
     </header>

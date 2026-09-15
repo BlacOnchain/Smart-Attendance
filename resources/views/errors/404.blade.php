@@ -22,11 +22,7 @@
 </head>
 <body class="flex items-center justify-center px-4">
     <div class="text-center max-w-md">
-        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-white mb-6">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2L20 6.5V17.5L12 22L4 17.5V6.5L12 2Z"/><path d="M9.5 12.5L11.3 14.3L15 10.2"/>
-            </svg>
-        </div>
+        <img src="{{ asset('images/smart-attendance-logo.png') }}" alt="Smart Attendance logo" class="mx-auto mb-6 h-14 w-14 rounded-2xl object-cover">
         <p class="mono text-xs font-bold" style="color: var(--brand-dark)">404</p>
         <h1 class="mt-2 text-2xl font-bold">This page doesn't exist</h1>
         <p class="mt-3 text-sm leading-6" style="color: #5b6660">

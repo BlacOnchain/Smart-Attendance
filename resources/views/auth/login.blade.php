@@ -222,12 +222,7 @@
             <section class="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-12" style="padding-top: max(2.5rem, env(safe-area-inset-top)); padding-bottom: max(2.5rem, env(safe-area-inset-bottom));">
                 <div class="w-full max-w-md">
                     <div class="anim-rise mb-8 flex items-center gap-3" style="--d: 0s">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 2L20 6.5V17.5L12 22L4 17.5V6.5L12 2Z"/>
-                                <path d="M9.5 12.5L11.3 14.3L15 10.2"/>
-                            </svg>
-                        </div>
+                        <img src="{{ asset('images/smart-attendance-logo.png') }}" alt="Smart Attendance logo" class="h-11 w-11 rounded-xl object-cover">
                         <span class="text-[15px] font-semibold tracking-tight">Smart Attendance</span>
                     </div>
 

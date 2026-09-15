@@ -601,6 +601,13 @@
         if (!localStorage.getItem('smart_attendance_cookie_consent')) {
             document.getElementById('cookieBanner').classList.remove('hidden');
         }
+
+        @media (max-width: 640px) {
+            .hero-mesh { height: 520px; }
+            .feature-card { padding: 1.25rem !important; }
+            .nav-glass { padding-left: 1rem; padding-right: 1rem; }
+            .nav-glass .text-\[15px\] { font-size: 14px; }
+        }
         function acceptCookies() {
             localStorage.setItem('smart_attendance_cookie_consent', 'accepted');
             document.getElementById('cookieBanner').remove();
