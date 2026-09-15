@@ -561,10 +561,6 @@
         </div>
     </footer>
 
-    <div id="cookieBanner" aria-hidden="true" class="fixed bottom-4 left-4 right-4 z-50 mx-auto hidden max-w-3xl rounded-2xl border border-emerald-100 bg-white p-4 shadow-2xl sm:flex sm:items-center sm:justify-between sm:gap-5">
-        <p class="text-xs leading-5 text-neutral-600">We use essential cookies to keep the portal secure and remember your preferences.</p>
-        <button type="button" onclick="acceptCookies()" class="mt-3 shrink-0 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 sm:mt-0">Accept</button>
-    </div>
     <a href="{{ route('login') }}" class="fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-bold text-white shadow-xl shadow-emerald-900/20 hover:bg-emerald-700 sm:hidden">Open student portal</a>
 
     @if (env('ANALYTICS_ID'))
@@ -604,21 +600,6 @@
 
         document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-        const cookieBanner = document.getElementById('cookieBanner');
-        const cookieConsentKey = 'smart_attendance_cookie_consent';
-
-        if (cookieBanner && localStorage.getItem(cookieConsentKey) !== 'accepted') {
-            cookieBanner.classList.remove('hidden');
-            cookieBanner.setAttribute('aria-hidden', 'false');
-        }
-
-        window.acceptCookies = function () {
-            localStorage.setItem(cookieConsentKey, 'accepted');
-            if (cookieBanner) {
-                cookieBanner.classList.add('hidden');
-                cookieBanner.setAttribute('aria-hidden', 'true');
-            }
-        };
     </script>
 </body>
 </html>
