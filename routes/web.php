@@ -12,6 +12,10 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::view('/privacy', 'privacy')->name('privacy');
+Route::view('/terms', 'terms')->name('terms');
+Route::view('/thank-you', 'thank-you')->name('thank-you');
+
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');

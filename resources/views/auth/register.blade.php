@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Create Account | Smart Attendance</title>
+    <meta name="description" content="Create your student Smart Attendance account and set your level, semester, and courses.">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <meta property="og:title" content="Create Account | Smart Attendance">
+    <meta property="og:description" content="Create a student account for your timetable and attendance.">
+    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

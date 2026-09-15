@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Lecturer Sign In | Smart Attendance</title>
+    <meta name="description" content="Sign in to open attendance sessions and review student check-ins.">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <meta property="og:title" content="Lecturer Sign In | Smart Attendance">
+    <meta property="og:description" content="Access the Smart Attendance lecturer portal.">
+    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">

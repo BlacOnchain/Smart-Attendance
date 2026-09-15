@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#059669">
     <title>Smart Attendance | Student Portal</title>
+    <meta name="description" content="Student portal for course registration, personalized timetables, and secure QR attendance check-ins.">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
+    <meta property="og:title" content="Smart Attendance | Student Portal">
+    <meta property="og:description" content="Manage your courses, timetable, and attendance in one student portal.">
+    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -295,10 +301,21 @@
                         </div>
                     </div>
                     <div class="flex shrink-0 items-center gap-2 sm:gap-3">
-                        <button class="btn-nudge rounded-full border p-2.5 text-slate-700 hover:text-emerald-800 bg-white/70 shadow-sm" style="border-color: var(--line)">
+                        <div class="relative">
+                        <button id="studentNotificationButton" type="button" onclick="toggleNotifications('studentNotificationMenu')" class="btn-nudge relative rounded-full border p-2.5 text-slate-700 hover:text-emerald-800 bg-white/70 shadow-sm" style="border-color: var(--line)" aria-label="Open notifications" aria-expanded="false" aria-controls="studentNotificationMenu">
                             <span class="sr-only">Notifications</span>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+                            <span class="absolute right-1 top-1 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
                         </button>
+                        <div id="studentNotificationMenu" class="absolute right-0 top-14 z-50 hidden w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border bg-white shadow-2xl" style="border-color: var(--line)">
+                            <div class="flex items-center justify-between border-b px-4 py-4" style="border-color: var(--line)"><div><p class="text-sm font-bold">Notifications</p><p class="text-xs text-slate-500">Department updates for you</p></div><span class="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700">3 new</span></div>
+                            <div class="space-y-1 p-2 text-left">
+                                <div class="rounded-2xl bg-emerald-50 p-3"><p class="text-sm font-bold text-emerald-900">Keep your profile current</p><p class="mt-1 text-xs leading-5 text-emerald-800">Your level and semester control the timetable and course list you see.</p></div>
+                                <div class="rounded-2xl p-3 hover:bg-slate-50"><p class="text-sm font-bold text-slate-800">Attendance reminder</p><p class="mt-1 text-xs leading-5 text-slate-500">Scan the lecturer's current QR code during your scheduled class.</p></div>
+                                <div class="rounded-2xl p-3 hover:bg-slate-50"><p class="text-sm font-bold text-slate-800">Course registration</p><p class="mt-1 text-xs leading-5 text-slate-500">Review your registered courses before printing your course form.</p></div>
+                            </div>
+                        </div>
+                        </div>
                         <a href="{{ route('student.profile') }}" class="lift-hover hidden items-center gap-3 rounded-full border bg-white/70 px-3 py-2 shadow-sm sm:flex hover:bg-white" style="border-color: var(--line)">
                             @if (Auth::user()->profile_photo_url)
                                 <img src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" class="h-10 w-10 rounded-full object-cover">
@@ -338,6 +355,10 @@
         </div>
     </div>
 
+    <a href="{{ route('student.camera') }}" class="fixed bottom-4 left-4 right-4 z-30 flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-bold text-white shadow-xl shadow-emerald-900/20 transition hover:bg-emerald-700 lg:hidden" style="padding-bottom: max(.875rem, env(safe-area-inset-bottom));">
+        <span class="text-lg">+</span> Scan attendance
+    </a>
+
     <script>
         const sidebar = document.getElementById('sidebar');
         const backdrop = document.getElementById('sidebarBackdrop');
@@ -362,6 +383,24 @@
                 closeSidebar();
             }
             lastWasDesktop = isDesktop;
+        });
+
+        function toggleNotifications(id) {
+            const menu = document.getElementById(id);
+            const button = document.getElementById('studentNotificationButton');
+            const isHidden = menu.classList.toggle('hidden');
+            button.setAttribute('aria-expanded', String(!isHidden));
+        }
+
+        document.addEventListener('click', (event) => {
+            const wrapper = document.getElementById('studentNotificationButton')?.parentElement;
+            if (wrapper && !wrapper.contains(event.target)) {
+                document.getElementById('studentNotificationMenu')?.classList.add('hidden');
+                document.getElementById('studentNotificationButton')?.setAttribute('aria-expanded', 'false');
+            }
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') document.getElementById('studentNotificationMenu')?.classList.add('hidden');
         });
     </script>
 

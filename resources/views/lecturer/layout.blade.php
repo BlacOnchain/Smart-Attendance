@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Attendance | Lecturer Portal</title>
+    <meta name="description" content="Lecturer portal for opening QR attendance sessions, managing courses, and reviewing student check-ins.">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
+    <meta property="og:title" content="Smart Attendance | Lecturer Portal">
+    <meta property="og:description" content="Open secure attendance sessions and review student check-ins.">
+    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -169,7 +175,16 @@
                             <h2 class="text-lg font-bold" style="color: var(--ink)">{{ Auth::user()->name }}</h2>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <button id="lecturerNotificationButton" type="button" onclick="toggleLecturerNotifications()" class="btn-nudge relative rounded-full border bg-white/70 p-2.5 text-slate-700 shadow-sm hover:text-emerald-800" style="border-color: var(--line)" aria-label="Open notifications" aria-expanded="false" aria-controls="lecturerNotificationMenu">
+                                <span class="sr-only">Notifications</span><span class="text-lg">🔔</span><span class="absolute right-1 top-1 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+                            </button>
+                            <div id="lecturerNotificationMenu" class="absolute right-0 top-14 z-50 hidden w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border bg-white shadow-2xl" style="border-color: var(--line)">
+                                <div class="border-b px-4 py-4" style="border-color: var(--line)"><p class="text-sm font-bold">Lecturer notifications</p><p class="text-xs text-slate-500">Important department updates</p></div>
+                                <div class="space-y-1 p-2 text-left"><div class="rounded-2xl bg-emerald-50 p-3"><p class="text-sm font-bold text-emerald-900">Keep sessions active only in class</p><p class="mt-1 text-xs leading-5 text-emerald-800">Close a session after the lecture so students cannot check in late.</p></div><div class="rounded-2xl p-3 hover:bg-slate-50"><p class="text-sm font-bold text-slate-800">Refresh the QR code if needed</p><p class="mt-1 text-xs leading-5 text-slate-500">A fresh token helps reduce copied or expired check-ins.</p></div><div class="rounded-2xl p-3 hover:bg-slate-50"><p class="text-sm font-bold text-slate-800">Review attendance records</p><p class="mt-1 text-xs leading-5 text-slate-500">Use Attendance Summary to check course participation.</p></div></div>
+                            </div>
+                        </div>
                         <div class="lift-hover hidden items-center gap-3 rounded-full border bg-white/70 px-3 py-2 shadow-sm sm:flex hover:bg-white" style="border-color: var(--line)">
                             <div class="flex h-10 w-10 items-center justify-center rounded-full text-white font-bold" style="background: var(--brand)">
                                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
@@ -252,6 +267,19 @@
         const backdrop = document.getElementById('sidebarBackdrop');
         function openSidebar() { sidebar.classList.remove('-translate-x-full'); backdrop.classList.remove('hidden'); }
         function closeSidebar() { sidebar.classList.add('-translate-x-full'); backdrop.classList.add('hidden'); }
+        function toggleLecturerNotifications() {
+            const menu = document.getElementById('lecturerNotificationMenu');
+            const button = document.getElementById('lecturerNotificationButton');
+            const isHidden = menu.classList.toggle('hidden');
+            button.setAttribute('aria-expanded', String(!isHidden));
+        }
+        document.addEventListener('click', (event) => {
+            const wrapper = document.getElementById('lecturerNotificationButton')?.parentElement;
+            if (wrapper && !wrapper.contains(event.target)) {
+                document.getElementById('lecturerNotificationMenu')?.classList.add('hidden');
+                document.getElementById('lecturerNotificationButton')?.setAttribute('aria-expanded', 'false');
+            }
+        });
     </script>
     @stack('scripts')
 </body>

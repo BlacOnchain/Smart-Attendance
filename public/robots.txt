@@ -1,2 +1,3 @@
 User-agent: *
 Disallow:
+Sitemap: https://smart-attendance-production-996c.up.railway.app/sitemap.xml

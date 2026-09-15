@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Attendance — QR check-ins for one CS department</title>
+    <title>Smart Attendance | Secure QR attendance for schools</title>
+    <meta name="description" content="A secure school attendance portal for student timetables, course registration, and lecturer-led QR check-ins.">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
+    <meta property="og:title" content="Smart Attendance | Secure QR attendance for schools">
+    <meta property="og:description" content="Students manage their timetable and check in securely while lecturers see attendance live.">
+    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -192,12 +198,7 @@
     <header class="nav-glass sticky top-0 z-50 px-6 py-4">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2L20 6.5V17.5L12 22L4 17.5V6.5L12 2Z"/>
-                        <path d="M9.5 12.5L11.3 14.3L15 10.2"/>
-                    </svg>
-                </div>
+                <img src="{{ asset('images/smart-attendance-logo.png') }}" alt="Smart Attendance logo" class="h-10 w-10 rounded-xl object-cover">
                 <span class="text-[15px] font-semibold tracking-tight">Smart Attendance</span>
             </div>
             <div class="flex items-center gap-5">
@@ -215,7 +216,7 @@
         <div class="relative mx-auto max-w-4xl px-6 pt-24 pb-20 text-center">
 
             <h1 class="reveal text-4xl sm:text-6xl font-bold tracking-tight leading-[1.1]" data-anim="rise">
-                QR attendance built for<br class="hidden sm:block"> one CS department
+                Attendance built for<br class="hidden sm:block"> focused learning
             </h1>
 
             <p class="reveal mt-6 text-lg text-neutral-600 max-w-xl mx-auto leading-relaxed" data-anim="rise" style="transition-delay:.08s">
@@ -284,7 +285,7 @@
                     <div class="flex items-center gap-3">
                         <div class="h-10 w-10 rounded-xl bg-neutral-900 text-white text-xs font-semibold flex items-center justify-center">JD</div>
                         <div>
-                            <p class="text-sm font-semibold">Jonathan Davis</p>
+                            <p class="text-sm font-semibold">Student profile</p>
                             <p class="text-xs text-neutral-500">Computer Science · 400L</p>
                         </div>
                     </div>
@@ -544,15 +545,26 @@
         <div class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div class="text-center sm:text-left">
                 <p class="text-sm font-semibold text-neutral-700">Smart Attendance</p>
-                <p class="mt-1 text-xs text-neutral-400">Built by Blac · attendance tools for real classrooms</p>
+                <p class="mt-1 text-xs text-neutral-400">Secure attendance tools for real classrooms</p>
             </div>
             <div class="flex items-center gap-5 text-xs font-medium text-neutral-500">
-                <a href="https://blaconchain.github.io/Portfolio/" target="_blank" rel="noreferrer" class="hover:text-emerald-700 transition">Portfolio</a>
-                <a href="https://twitter.com/Lifewithblac" target="_blank" rel="noreferrer" class="hover:text-emerald-700 transition">Twitter · @Lifewithblac</a>
-                <a href="https://www.linkedin.com/in/lifewithblac" target="_blank" rel="noreferrer" class="hover:text-emerald-700 transition">LinkedIn</a>
+                <a href="{{ route('privacy') }}" class="hover:text-emerald-700 transition">Privacy</a>
+                <a href="{{ route('terms') }}" class="hover:text-emerald-700 transition">Terms</a>
+                <a href="mailto:{{ env('CONTACT_EMAIL', 'department@example.com') }}" class="hover:text-emerald-700 transition">Contact</a>
             </div>
         </div>
     </footer>
+
+    <div id="cookieBanner" class="fixed bottom-4 left-4 right-4 z-50 mx-auto hidden max-w-3xl rounded-2xl border border-emerald-100 bg-white p-4 shadow-2xl sm:flex sm:items-center sm:justify-between sm:gap-5">
+        <p class="text-xs leading-5 text-neutral-600">We use essential cookies to keep the portal secure and remember your preferences.</p>
+        <button type="button" onclick="acceptCookies()" class="mt-3 shrink-0 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 sm:mt-0">Accept</button>
+    </div>
+    <a href="{{ route('login') }}" class="fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-bold text-white shadow-xl shadow-emerald-900/20 hover:bg-emerald-700 sm:hidden">Open student portal</a>
+
+    @if (env('ANALYTICS_ID'))
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('ANALYTICS_ID') }}"></script>
+        <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ env('ANALYTICS_ID') }}');</script>
+    @endif
 
     <script>
         // Hero live token ticker
@@ -585,6 +597,14 @@
         }, { threshold: 0.25 });
 
         document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+        if (!localStorage.getItem('smart_attendance_cookie_consent')) {
+            document.getElementById('cookieBanner').classList.remove('hidden');
+        }
+        function acceptCookies() {
+            localStorage.setItem('smart_attendance_cookie_consent', 'accepted');
+            document.getElementById('cookieBanner').remove();
+        }
     </script>
 </body>
 </html>
