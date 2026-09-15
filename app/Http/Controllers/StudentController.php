@@ -105,10 +105,19 @@ class StudentController extends Controller
         $curriculum = config('curriculum.levels', []);
         $levelData = $curriculum[$configLevelKey] ?? [];
         $curriculumCourses = $levelData['semesters'][$semesterKey] ?? [];
-
-        $this->syncCurriculumCourses($curriculumCourses, $configLevelKey, $semesterKey);
-
         $courseCodes = collect($curriculumCourses)->pluck('code')->values()->all();
+
+        $hasCourses = Course::where('level', $configLevelKey)
+            ->where('semester', $semesterKey)
+            ->whereIn('course_code', $courseCodes ?? [])
+            ->exists();
+
+        // Seeders normally create the catalogue. Keep this fallback for an
+        // older installation, but do not write the same course rows on every
+        // profile page visit.
+        if (! $hasCourses) {
+            $this->syncCurriculumCourses($curriculumCourses, $configLevelKey, $semesterKey);
+        }
 
         $availableCourses = Course::query()
             ->where('level', $configLevelKey)
@@ -280,6 +289,12 @@ class StudentController extends Controller
         $enrolledCourseCodes = $user->courses()->pluck('course_code')->all();
 
         $timetables = Timetable::whereIn('course_code', $levelCourseCodes)
+            ->where(function ($query) use ($configLevelKey) {
+                $query->whereNull('level')->orWhere('level', $configLevelKey);
+            })
+            ->where(function ($query) use ($semesterKey) {
+                $query->whereNull('semester')->orWhere('semester', $semesterKey);
+            })
             ->get()
             ->keyBy('course_code');
 
@@ -347,7 +362,15 @@ class StudentController extends Controller
             $user->update(['profile_photo_path' => $path]);
         }
 
-        $user->courses()->sync($data['courses'] ?? []);
+        $selectedLevel = $this->normalizeLevel($data['level'] ?? $user->level);
+        $selectedSemester = $this->normalizeSemester($data['semester'] ?? $user->semester);
+        $allowedCourseIds = Course::where('level', $selectedLevel)
+            ->where('semester', $selectedSemester)
+            ->whereIn('id', $data['courses'] ?? [])
+            ->pluck('id')
+            ->all();
+
+        $user->courses()->sync($allowedCourseIds);
 
         return redirect()
             ->route('student.profile')

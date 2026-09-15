@@ -71,6 +71,11 @@ Route::middleware(['auth', 'role:lecturer'])->group(function () {
     Route::get('/hod/dashboard', [HodController::class, 'dashboard'])->name('hod.dashboard');
     Route::get('/hod/reports', [HodController::class, 'reports'])->name('hod.reports');
     Route::get('/hod/reports/export', [HodController::class, 'exportReports'])->name('hod.reports.export');
+    Route::get('/hod/manage', [HodController::class, 'manage'])->name('hod.manage');
+    Route::post('/hod/lecturers', [HodController::class, 'storeLecturer'])->name('hod.lecturers.store');
+    Route::post('/hod/courses', [HodController::class, 'storeCourse'])->name('hod.courses.store');
+    Route::post('/hod/timetables', [HodController::class, 'storeTimetable'])->name('hod.timetables.store');
+    Route::delete('/hod/timetables/{timetable}', [HodController::class, 'deleteTimetable'])->name('hod.timetables.delete');
 });
 
 Route::middleware(['auth', 'role:student'])->group(function () {

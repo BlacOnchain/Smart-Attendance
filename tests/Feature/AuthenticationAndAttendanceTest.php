@@ -77,4 +77,50 @@ class AuthenticationAndAttendanceTest extends TestCase
         $response->assertForbidden();
         $this->assertDatabaseCount('attendances', 0);
     }
+
+    public function test_hod_can_open_department_management(): void
+    {
+        $hod = User::factory()->create([
+            'role' => 'lecturer',
+            'is_hod' => true,
+        ]);
+
+        $this->actingAs($hod)
+            ->get(route('hod.manage'))
+            ->assertOk()
+            ->assertSee('Manage department');
+    }
+
+    public function test_student_cannot_check_into_a_course_for_another_level(): void
+    {
+        $student = User::factory()->create([
+            'role' => 'student',
+            'level' => '200',
+            'semester' => 'First',
+        ]);
+        $lecturer = User::factory()->create(['role' => 'lecturer']);
+        $course = Course::create([
+            'course_code' => 'COM 100',
+            'course_title' => 'Introductory Course',
+            'level' => '100',
+            'department' => 'Computer Science',
+            'semester' => 'First',
+            'units' => 3,
+            'lecturer_id' => $lecturer->id,
+        ]);
+        $student->courses()->attach($course->id);
+        $session = AttendanceSession::create([
+            'course_code' => $course->course_code,
+            'session_token' => 'wrong-level-token',
+            'token_generated_at' => now(),
+            'is_active' => true,
+            'lecturer_id' => $lecturer->id,
+        ]);
+
+        $this->actingAs($student)
+            ->post(route('student.log', $session->session_token))
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('attendances', 0);
+    }
 }

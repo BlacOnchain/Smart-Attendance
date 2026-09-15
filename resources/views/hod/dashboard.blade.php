@@ -61,6 +61,7 @@
 
         <div class="flex flex-wrap gap-3">
             <a href="{{ route('admin.course-assignments') }}" class="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white">Manage course assignments</a>
+            <a href="{{ route('hod.manage') }}" class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700">Manage department</a>
             <a href="{{ route('hod.reports') }}" class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700">Open attendance reports</a>
         </div>
 

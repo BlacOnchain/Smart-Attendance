@@ -123,6 +123,10 @@ class AttendanceController extends Controller
             abort(403, 'You can only start sessions for courses assigned to you.');
         }
 
+        if (AttendanceSession::where('course_code', $courseCode)->where('is_active', true)->exists()) {
+            return back()->withErrors(['course_code' => 'This course already has an active attendance session. Close it before starting another one.']);
+        }
+
         AttendanceSession::create([
             'course_code' => $courseCode,
             'session_token' => Str::random(40),
@@ -194,6 +198,17 @@ class AttendanceController extends Controller
             ], 403);
         }
 
+        $course = Course::where('course_code', $session->course_code)->first();
+        $studentLevel = $this->normalizeAcademicLevel(Auth::user()->level);
+        if ($course && $studentLevel && $course->level && $studentLevel !== $this->normalizeAcademicLevel($course->level)) {
+            return response()->json(['message' => 'This course is not assigned to your academic level.'], 403);
+        }
+
+        if ($course && Auth::user()->semester && $course->semester &&
+            $this->normalizeSemester(Auth::user()->semester) !== $this->normalizeSemester($course->semester)) {
+            return response()->json(['message' => 'This course is not assigned to your current semester.'], 403);
+        }
+
         if ($this->isTokenExpired($session)) {
             return response()->json([
                 'message' => 'This QR code has expired. Please scan the current code on your lecturer\'s screen.',
@@ -211,6 +226,16 @@ class AttendanceController extends Controller
 
         $schedule = Timetable::where('course_code', $session->course_code)
             ->where('day_of_week', $currentDay)
+            ->when($course?->level, function ($query, $level) {
+                $query->where(function ($nested) use ($level) {
+                    $nested->whereNull('level')->orWhere('level', $level);
+                });
+            })
+            ->when($course?->semester, function ($query, $semester) {
+                $query->where(function ($nested) use ($semester) {
+                    $nested->whereNull('semester')->orWhere('semester', $semester);
+                });
+            })
             ->first();
 
         if ($schedule) {
@@ -306,5 +331,21 @@ class AttendanceController extends Controller
         return $driverCode == 1062
             || $sqlState === '23505'
             || str_contains($e->getMessage(), 'UNIQUE constraint failed');
+    }
+
+    private function normalizeAcademicLevel(?string $level): ?string
+    {
+        return match (strtoupper(trim((string) $level)) ) {
+            'ND1', '100' => '100',
+            'ND2', '200' => '200',
+            'HND1', '300' => '300',
+            'HND2', '400' => '400',
+            default => null,
+        };
+    }
+
+    private function normalizeSemester(?string $semester): string
+    {
+        return stripos((string) $semester, 'second') !== false ? 'Second' : 'First';
     }
 }
