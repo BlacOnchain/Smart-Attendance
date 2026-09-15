@@ -224,6 +224,7 @@
         .auth-form-pane .tag-badge { color: #a8aab4; background: transparent; border: 0; padding: 0; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: .22em; }
         .auth-form-pane .tag-badge::before { display: none; }
         .auth-form-pane h2 { color: #f8fafc; font-size: clamp(2rem, 5vw, 3rem); }
+        .auth-form-pane p[style] { color: #a6a8b1 !important; }
         .auth-form-pane .field-label { color: #9b9da6; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
         .auth-form-pane .glass-input { border: 0; border-bottom: 1px solid #4a4b52; border-radius: 0; background: transparent; color: #f8fafc; box-shadow: none; padding-left: 0; }
         .auth-form-pane .glass-input:focus { border-bottom-color: #a56be8; box-shadow: 0 2px 0 #a56be8; background: transparent; }
@@ -248,12 +249,23 @@
         .auth-art-pane p, .auth-art-pane .step-label { color: rgba(255,255,255,.76) !important; }
         .auth-art-pane .step-num { background: #fff; color: #8750d4; }
         .auth-art-pane .step-arrow { color: rgba(255,255,255,.55); }
-        .auth-art-visual { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
-        .auth-art-visual img { width: clamp(150px, 20vw, 250px); height: clamp(150px, 20vw, 250px); object-fit: contain; filter: drop-shadow(0 24px 24px rgba(44,19,83,.22)); animation: shieldFloat 5s ease-in-out infinite; }
-        .auth-art-visual span { max-width: 150px; color: rgba(255,255,255,.88); font-size: .95rem; line-height: 1.5; }
+        .auth-art-visual { display: flex; align-items: center; gap: clamp(1rem, 3vw, 2rem); margin: 1.5rem 0; }
+        .auth-visual-orbit { position: relative; display: grid; place-items: center; width: clamp(170px, 22vw, 260px); height: clamp(170px, 22vw, 260px); flex: 0 0 auto; }
+        .auth-visual-orbit::before { content: ''; position: absolute; inset: 8%; border: 1px solid rgba(255,255,255,.25); border-radius: 42% 58% 56% 44%; transform: rotate(25deg); }
+        .auth-visual-orbit::after { content: ''; position: absolute; inset: 0; border: 1px dashed rgba(255,255,255,.2); border-radius: 50%; transform: rotate(-20deg); }
+        .auth-art-visual img { width: 78%; height: 78%; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 24px 24px rgba(44,19,83,.22)); animation: shieldFloat 5s ease-in-out infinite; }
+        .auth-checkmark { position: absolute; z-index: 2; right: 5%; bottom: 10%; display: grid; place-items: center; width: 38px; height: 38px; border: 3px solid #8750d4; border-radius: 50%; background: #fff; color: #1ba978; font-size: 1.35rem; font-weight: 800; }
+        .auth-preview-card { width: min(205px, 42vw); padding: 1rem; border: 1px solid rgba(255,255,255,.22); border-radius: 18px; background: rgba(30,14,60,.2); box-shadow: 0 20px 35px rgba(44,19,83,.14); }
+        .auth-preview-card p { margin: 0; color: rgba(255,255,255,.7) !important; font-size: .73rem; }
+        .auth-preview-card strong { display: block; margin: .3rem 0 .6rem; color: #fff; font-size: 2rem; line-height: 1; }
+        .auth-progress { height: 7px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.2); }
+        .auth-progress span { display: block; width: 92%; height: 100%; border-radius: inherit; background: #b9f4d8; }
+        .auth-preview-card > div:last-child { display: flex; justify-content: space-between; gap: .5rem; margin-top: .65rem; color: #b9f4d8; font-size: .65rem; }
+        .auth-preview-card b { color: rgba(255,255,255,.75); font-weight: 500; text-align: right; }
         @keyframes shieldFloat { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(2deg); } }
         .auth-art-pane .glass-panel, .auth-art-pane .glass-chip { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.18); box-shadow: none; color: #fff; }
         .auth-art-pane .glass-panel::before { display: none; }
+        .auth-art-pane > .glass-panel { display: none; }
         .auth-art-pane .chip-icon { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.2); color: #fff; }
         .auth-art-pane .glass-chip p, .auth-art-pane .glass-panel p { color: rgba(255,255,255,.75) !important; }
         @media (max-width: 1023px) {
@@ -267,7 +279,9 @@
         @media (max-width: 520px) {
             .auth-back { width: 54px; height: 54px; top: 0; left: 8px; font-size: 32px; }
             .auth-form-pane { padding-left: 1.35rem !important; padding-right: 1.35rem !important; }
-            .auth-art-visual img { width: 135px; height: 135px; }
+            .auth-art-visual { gap: .8rem; }
+            .auth-visual-orbit { width: 135px; height: 135px; }
+            .auth-preview-card { width: 165px; }
         }
     </style>
 </head>
@@ -372,8 +386,16 @@
                 </div>
 
                 <div class="auth-art-visual anim-scale" style="--d: 0.18s">
-                    <img src="{{ asset('images/logo-3d-512.png') }}" alt="Smart Attendance shield" loading="eager">
-                    <span>Secure attendance, beautifully simple.</span>
+                    <div class="auth-visual-orbit">
+                        <img src="{{ asset('images/logo-3d-512.png') }}" alt="Smart Attendance shield" loading="eager">
+                        <span class="auth-checkmark">✓</span>
+                    </div>
+                    <div class="auth-preview-card">
+                        <p>Attendance overview</p>
+                        <strong>92%</strong>
+                        <div class="auth-progress"><span></span></div>
+                        <div><span>On track</span><b>3 classes today</b></div>
+                    </div>
                 </div>
 
                 <div class="anim-scale glass-panel rounded-2xl p-5 flex items-center gap-3 max-w-sm" style="--d: 0.16s">
