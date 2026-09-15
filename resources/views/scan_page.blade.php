@@ -8,7 +8,7 @@
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <meta property="og:title" content="Attendance Check-in | Smart Attendance">
     <meta property="og:description" content="Check in securely to your current class.">
-    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.png') }}">
+    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.svg') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -8,7 +8,7 @@
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <meta property="og:title" content="Lecturer Sign In | Smart Attendance">
     <meta property="og:description" content="Access the Smart Attendance lecturer portal.">
-    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.png') }}">
+    <meta property="og:image" content="{{ asset('images/smart-attendance-logo.svg') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -215,7 +215,7 @@
             <section class="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-12" style="padding-top: max(2.5rem, env(safe-area-inset-top)); padding-bottom: max(2.5rem, env(safe-area-inset-bottom));">
                 <div class="w-full max-w-md">
                     <div class="anim-rise mb-8 flex items-center gap-3" style="--d: 0s">
-                        <img src="{{ asset('images/smart-attendance-logo.png') }}" alt="Smart Attendance logo" class="h-11 w-11 rounded-xl object-cover">
+                        <img src="{{ asset('images/smart-attendance-logo.svg') }}" alt="Smart Attendance logo" class="h-11 w-11 rounded-xl object-cover">
                         <span class="text-[15px] font-semibold tracking-tight">Smart Attendance</span>
                     </div>
 

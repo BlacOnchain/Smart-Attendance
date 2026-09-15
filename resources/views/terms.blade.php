@@ -19,7 +19,7 @@
 <body class="min-h-screen">
     <header class="border-b sticky top-0 bg-white/90 backdrop-blur z-10" style="border-color: var(--line)">
         <div class="mx-auto max-w-3xl px-6 py-4 flex items-center gap-3">
-            <img src="{{ asset('images/smart-attendance-logo.png') }}" alt="Smart Attendance logo" class="h-9 w-9 rounded-xl object-cover">
+            <img src="{{ asset('images/smart-attendance-logo.svg') }}" alt="Smart Attendance logo" class="h-9 w-9 rounded-xl object-cover">
             <span class="font-semibold">Smart Attendance</span>
         </div>
     </header>

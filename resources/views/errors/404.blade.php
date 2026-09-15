@@ -22,7 +22,7 @@
 </head>
 <body class="flex items-center justify-center px-4">
     <div class="text-center max-w-md">
-        <img src="{{ asset('images/smart-attendance-logo.png') }}" alt="Smart Attendance logo" class="mx-auto mb-6 h-14 w-14 rounded-2xl object-cover">
+        <img src="{{ asset('images/smart-attendance-logo.svg') }}" alt="Smart Attendance logo" class="mx-auto mb-6 h-14 w-14 rounded-2xl object-cover">
         <p class="mono text-xs font-bold" style="color: var(--brand-dark)">404</p>
         <h1 class="mt-2 text-2xl font-bold">This page doesn't exist</h1>
         <p class="mt-3 text-sm leading-6" style="color: #5b6660">
