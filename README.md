@@ -1,4 +1,80 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Smart Attendance
+
+Smart Attendance is a Laravel application for Computer Science departments. Students register their level and semester, select courses, view their timetable, and check in with a lecturer's time-limited QR code. Lecturers open sessions, monitor check-ins, and manage assigned courses.
+
+## Local setup with XAMPP
+
+Run these commands from the project folder:
+
+```text
+composer install
+copy .env.example .env
+php artisan key:generate
+npm install
+php artisan migrate
+php artisan db:seed
+npm run build
+php artisan serve
+```
+
+Set the local database values in `.env` before migrating:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=smart_attendance2
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+The database must already exist in MariaDB/phpMyAdmin. If MariaDB reports that `localhost` is not allowed, repair the MySQL `root` account host permissions or use the host and credentials created by XAMPP.
+
+## Railway deployment
+
+The production application is deployed at [smart-attendance-production-996c.up.railway.app](https://smart-attendance-production-996c.up.railway.app/). Railway should provide PostgreSQL connection values through its database service. Confirm these variables in the Railway service:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+DB_CONNECTION=pgsql
+DATABASE_URL=<Railway PostgreSQL connection URL>
+```
+
+After deploying a migration change, run the migration as part of the Railway start/deploy process:
+
+```text
+php artisan migrate --force
+php artisan db:seed --force
+```
+
+Do not run `migrate:fresh` on Railway because it deletes production data.
+
+## Accounts and roles
+
+Public registration creates student accounts only. Lecturer accounts should be created by an administrator or inserted securely with `role=lecturer`. HOD course assignment requires `is_hod=1`.
+
+## Verification
+
+```text
+php artisan test
+php artisan view:cache
+npm run build
+```
+
+The feature tests cover registration, lecturer/student role separation, and preventing attendance by students who are not enrolled in the course.
+
+## Application structure
+
+- `app/Http/Controllers`: authentication, student, lecturer, and attendance workflows.
+- `database/migrations`: the canonical database structure for new and existing installations.
+- `database/seeders`: course catalog and timetable data.
+- `resources/views/auth`: student and lecturer login pages.
+- `resources/views/student`: student portal pages.
+- `resources/views/lecturer`: lecturer portal pages.
+
+---
+
 
 <p align="center">
 <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>

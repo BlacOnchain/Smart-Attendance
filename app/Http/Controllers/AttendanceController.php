@@ -170,6 +170,10 @@ class AttendanceController extends Controller
             return response()->json(['message' => 'Please sign in first.'], 401);
         }
 
+        if (Auth::user()->role !== 'student') {
+            return response()->json(['message' => 'Only student accounts can record attendance.'], 403);
+        }
+
         $session = AttendanceSession::where('session_token', $token)
             ->where('is_active', true)
             ->first();
@@ -178,6 +182,16 @@ class AttendanceController extends Controller
             return response()->json([
                 'message' => 'This QR code is no longer active. Ask your lecturer for the current code.',
             ], 404);
+        }
+
+        $isEnrolled = Auth::user()->courses()
+            ->where('course_code', $session->course_code)
+            ->exists();
+
+        if (!$isEnrolled) {
+            return response()->json([
+                'message' => 'You are not registered for this course.',
+            ], 403);
         }
 
         if ($this->isTokenExpired($session)) {

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
+use App\Models\LoginActivity;
+use App\Mail\NewDeviceLoginAlert;
 
 class AuthController extends Controller
 {
@@ -37,6 +39,78 @@ class AuthController extends Controller
         Auth::login($user);
 
         return redirect()->route('student.profile')->with('success', 'Account created successfully.');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        if (!Auth::attempt($credentials)) {
+            return back()->withErrors(['email' => 'The provided credentials do not match our records.'])
+                ->onlyInput('email');
+        }
+
+        $request->session()->regenerate();
+        $user = Auth::user();
+        $this->recordLogin($request, $user);
+
+        return redirect()->intended($user->role === 'lecturer'
+            ? route('lecturer.dashboard')
+            : route('student.dashboard'));
+    }
+
+    public function lecturerLogin(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        if (!Auth::attempt($credentials)) {
+            return back()->withErrors(['email' => 'The provided credentials do not match our records.'])
+                ->onlyInput('email');
+        }
+
+        if (Auth::user()->role !== 'lecturer') {
+            Auth::logout();
+            return back()->withErrors(['email' => 'This account is not a lecturer account.'])
+                ->onlyInput('email');
+        }
+
+        $request->session()->regenerate();
+        $this->recordLogin($request, Auth::user());
+
+        return redirect()->intended(route('lecturer.dashboard'));
+    }
+
+    private function recordLogin(Request $request, User $user): void
+    {
+        $ip = $request->ip();
+        $isNewIp = !LoginActivity::where('user_id', $user->id)
+            ->where('ip_address', $ip)
+            ->exists();
+
+        LoginActivity::create([
+            'user_id' => $user->id,
+            'ip_address' => $ip,
+            'location' => LoginActivity::locateIp($ip),
+            'user_agent' => $request->userAgent(),
+            'session_id' => $request->session()->getId(),
+            'logged_in_at' => now(),
+        ]);
+
+        if ($isNewIp) {
+            try {
+                Mail::to($user->email)->send(
+                    new NewDeviceLoginAlert($user, $ip, $request->userAgent(), now())
+                );
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
+        }
     }
 
     // --- OTP Forgot Password Methods ---

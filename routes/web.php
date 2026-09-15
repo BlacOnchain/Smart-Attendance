@@ -4,11 +4,8 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseAssignmentController;
 use App\Http\Controllers\StudentController;
-use App\Mail\NewDeviceLoginAlert;
-use App\Models\LoginActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,106 +20,11 @@ Route::get('/lecturer/login', function () {
     return view('auth.lecturer-login');
 })->name('lecturer.login');
 
-Route::post('/login', function (Request $request) {
-    $credentials = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:5,1')->name('login.submit');
 
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-
-        $user = Auth::user();
-        $ip = $request->ip();
-
-        $isNewIp = !LoginActivity::where('user_id', $user->id)
-            ->where('ip_address', $ip)
-            ->exists();
-
-        LoginActivity::create([
-            'user_id' => $user->id,
-            'ip_address' => $ip,
-            'location' => LoginActivity::locateIp($ip),
-            'user_agent' => $request->userAgent(),
-            'session_id' => $request->session()->getId(),
-            'logged_in_at' => now(),
-        ]);
-
-        if ($isNewIp) {
-            try {
-                Mail::to($user->email)->send(
-                    new NewDeviceLoginAlert($user, $ip, $request->userAgent(), now())
-                );
-            } catch (\Exception $e) {
-                // Never block a legitimate login over a mail delivery failure.
-                // With MAIL_MAILER=log this should never actually throw locally.
-                report($e);
-            }
-        }
-
-        $target = $user && $user->role === 'lecturer'
-            ? route('lecturer.dashboard')
-            : route('student.dashboard');
-
-        return redirect()->intended($target);
-    }
-
-    return back()->withErrors([
-        'email' => 'The provided credentials do not match our records.',
-    ])->onlyInput('email');
-})->middleware('throttle:5,1')->name('login.submit');
-
-Route::post('/lecturer/login', function (Request $request) {
-    $credentials = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
-
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-
-        $user = Auth::user();
-
-        if ($user && $user->role === 'lecturer') {
-            $ip = $request->ip();
-
-            $isNewIp = !LoginActivity::where('user_id', $user->id)
-                ->where('ip_address', $ip)
-                ->exists();
-
-            LoginActivity::create([
-                'user_id' => $user->id,
-                'ip_address' => $ip,
-                'location' => LoginActivity::locateIp($ip),
-                'user_agent' => $request->userAgent(),
-                'session_id' => $request->session()->getId(),
-                'logged_in_at' => now(),
-            ]);
-
-            if ($isNewIp) {
-                try {
-                    Mail::to($user->email)->send(
-                        new NewDeviceLoginAlert($user, $ip, $request->userAgent(), now())
-                    );
-                } catch (\Exception $e) {
-                    report($e);
-                }
-            }
-
-            return redirect()->intended(route('lecturer.dashboard'));
-        }
-
-        Auth::logout();
-
-        return back()->withErrors([
-            'email' => 'This account is not a lecturer account.',
-        ])->onlyInput('email');
-    }
-
-    return back()->withErrors([
-        'email' => 'The provided credentials do not match our records.',
-    ])->onlyInput('email');
-})->middleware('throttle:5,1')->name('lecturer.login.submit');
+Route::post('/lecturer/login', [AuthController::class, 'lecturerLogin'])
+    ->middleware('throttle:5,1')->name('lecturer.login.submit');
 
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.submit');

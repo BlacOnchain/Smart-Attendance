@@ -39,7 +39,7 @@ class CourseAssignmentController extends Controller
         $this->ensureAdmin();
 
         $data = $request->validate([
-            'lecturer_id' => ['nullable', 'exists:users,id'],
+            'lecturer_id' => ['nullable', 'exists:users,id,role,lecturer'],
         ]);
 
         $course->update(['lecturer_id' => $data['lecturer_id'] ?? null]);
