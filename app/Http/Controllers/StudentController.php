@@ -354,12 +354,22 @@ class StudentController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            if ($user->profile_photo_path) {
-                Storage::disk('public')->delete($user->profile_photo_path);
+            $disk = Storage::disk('public');
+            $oldPath = $user->profile_photo_path;
+            $path = $request->file('photo')->store('profile-photos', 'public');
+
+            // Do not remove the old photo until the replacement is confirmed on disk.
+            if (! $path || ! $disk->exists($path)) {
+                return back()
+                    ->withErrors(['photo' => 'The photo could not be saved. Please try again.'])
+                    ->withInput();
             }
 
-            $path = $request->file('photo')->store('profile-photos', 'public');
             $user->update(['profile_photo_path' => $path]);
+
+            if ($oldPath && $oldPath !== $path) {
+                $disk->delete($oldPath);
+            }
         }
 
         $selectedLevel = $this->normalizeLevel($data['level'] ?? $user->level);

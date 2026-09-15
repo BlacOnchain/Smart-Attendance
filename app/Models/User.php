@@ -66,8 +66,12 @@ class User extends Authenticatable
      */
     public function getProfilePhotoUrlAttribute(): ?string
     {
-        return $this->profile_photo_path
-            ? route('profile.photo', ['path' => $this->profile_photo_path])
-            : null;
+        if (! $this->profile_photo_path) {
+            return null;
+        }
+
+        $version = $this->updated_at?->timestamp ?? time();
+
+        return route('profile.photo', ['path' => $this->profile_photo_path]) . '?v=' . $version;
     }
 }
