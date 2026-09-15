@@ -127,6 +127,47 @@
         </article>
     </section>
 
+    <!-- Today at a glance: timetable entries are already filtered by the student's courses. -->
+    <section class="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+        <div class="stagger-up rounded-[28px] bg-white/80 p-5 shadow-sm border sm:p-6" style="--d: 0.26s; border-color: var(--line)">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="eyebrow">{{ now()->format('l, M j') }}</p>
+                    <h2 class="mt-1 text-xl font-bold" style="color: var(--ink)">Today’s timetable</h2>
+                    <p class="mt-1 text-sm" style="color: #7a8580">Only classes for your selected level and semester.</p>
+                </div>
+                <a href="{{ route('student.timetable') }}" class="text-xs font-bold text-emerald-700 hover:text-emerald-900">View full schedule</a>
+            </div>
+            <div class="mt-5 space-y-3">
+                @forelse ($todayTimetable as $slot)
+                    <div class="flex items-center gap-3 rounded-2xl border px-4 py-3" style="border-color: rgba(5,150,105,.14); background: rgba(5,150,105,.05)">
+                        <div class="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-emerald-600 text-white">
+                            <span class="mono text-[10px]">{{ substr($slot->start_time, 0, 5) }}</span>
+                            <span class="text-[9px] text-emerald-100">start</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-bold" style="color: var(--ink)">{{ $slot->course_code }}</p>
+                            <p class="truncate text-xs" style="color: #7a8580">{{ $slot->venue ?: 'Venue to be announced' }}</p>
+                        </div>
+                        <span class="shrink-0 text-xs font-semibold text-emerald-700">{{ substr($slot->end_time, 0, 5) }}</span>
+                    </div>
+                @empty
+                    <div class="rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/30 px-4 py-6 text-center text-sm text-slate-500">No class scheduled for today.</div>
+                @endforelse
+            </div>
+        </div>
+
+        <div class="stagger-up relative overflow-hidden rounded-[28px] p-5 text-white shadow-lg sm:p-6" style="--d: 0.3s; background: linear-gradient(145deg, #047857, #059669 65%, #14b8a6); box-shadow: 0 24px 45px -22px rgba(5,150,105,.5)">
+            <div class="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full border border-white/20"></div>
+            <div class="relative">
+                <p class="mono text-[11px] font-semibold uppercase tracking-[.14em] text-emerald-100">Live check-in</p>
+                <h2 class="mt-2 text-xl font-bold">{{ $activeSession ? $activeSession->course_code . ' is live' : 'Ready when class begins' }}</h2>
+                <p class="mt-2 text-sm leading-6 text-emerald-50/85">{{ $activeSession ? ($hasCheckedInActive ? 'Your attendance has been recorded for this session.' : 'Scan the lecturer’s QR code to record your attendance.') : 'Your active course sessions will appear here.' }}</p>
+                <a href="{{ route('student.camera') }}" class="btn-nudge mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-bold text-emerald-800 hover:bg-emerald-50">Open QR scanner <span aria-hidden="true">→</span></a>
+            </div>
+        </div>
+    </section>
+
     <!-- Student journey -->
     <section class="stagger-up rounded-2xl bg-white/80 p-5 shadow-sm border" style="--d: 0.28s; border-color: var(--line)">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

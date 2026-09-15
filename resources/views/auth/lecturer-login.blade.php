@@ -204,16 +204,71 @@
         .password-meter span { display: block; height: 100%; width: 0; border-radius: inherit; transition: width .25s ease, background-color .25s ease; }
         .otp-status.checking { color: var(--brand-dark); animation: statusIn .35s ease both; }
         @keyframes statusIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+        /* Unified emerald glass auth system. */
+        body.auth-page { background: linear-gradient(160deg, #e9f4ec 0%, #f6f8f2 48%, #eef6f1 100%); }
+        .auth-layout { max-width: none; }
+        .auth-back { position: fixed; z-index: 30; top: 18px; left: 20px; display: grid; place-items: center; width: 62px; height: 62px; border-radius: 0 0 18px 0; background: #fff; color: #10201a; font-size: 38px; line-height: 1; box-shadow: 0 8px 22px rgba(16,32,26,.08); transition: transform .2s ease; }
+        .auth-back:hover { transform: translateX(-3px); }
+        .auth-form-pane { background: #10201a; color: #f8fafc; }
+        .auth-form-pane > div { max-width: 470px; }
+        .auth-form-pane .glass-panel { background: transparent; border: 0; box-shadow: none; backdrop-filter: none; padding: 0 !important; overflow: visible; }
+        .auth-form-pane .glass-panel::before { display: none; }
+        .auth-form-pane .tag-badge { color: #a7f3d0; background: transparent; border: 0; padding: 0; font-size: 12px; text-transform: uppercase; letter-spacing: .2em; }
+        .auth-form-pane .tag-badge::before { display: none; }
+        .auth-form-pane h2 { color: #f8fafc; font-size: clamp(2rem, 5vw, 3rem); }
+        .auth-form-pane p[style] { color: #a6a8b1 !important; }
+        .auth-form-pane .field-label { color: #9b9da6; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+        .auth-form-pane .glass-input { border: 0; border-bottom: 1px solid #4a4b52; border-radius: 0; background: transparent; color: #f8fafc; box-shadow: none; padding-left: 0; }
+        .auth-form-pane .glass-input:focus { border-bottom-color: #34d399; box-shadow: 0 2px 0 #34d399; background: transparent; }
+        .auth-form-pane .glass-input::placeholder { color: #686a73; }
+        .auth-form-pane .input-icon { display: none; }
+        .auth-form-pane .btn-nudge { border-radius: 8px; background: #059669 !important; box-shadow: 0 12px 24px rgba(5,150,105,.22); }
+        .auth-form-pane .btn-nudge:hover { background: #047857 !important; }
+        .auth-form-pane a { color: #6ee7b7 !important; }
+        .auth-form-pane a:hover { color: #a7f3d0 !important; }
+        .auth-art-pane { display: flex !important; position: relative; overflow: hidden; background: linear-gradient(145deg, #047857 0%, #059669 48%, #14b8a6 100%); color: #fff; }
+        .auth-art-pane::before, .auth-art-pane::after { content: ''; position: absolute; border-radius: 999px; background: rgba(255,255,255,.11); pointer-events: none; }
+        .auth-art-pane::before { width: 390px; height: 210px; top: 7%; right: -100px; transform: rotate(-20deg); }
+        .auth-art-pane::after { width: 520px; height: 260px; bottom: 7%; left: -170px; transform: rotate(18deg); }
+        .auth-art-pane > * { position: relative; z-index: 1; }
+        .auth-art-pane .tag-badge { color: rgba(255,255,255,.82); background: transparent; border: 0; padding: 0; }
+        .auth-art-pane .tag-badge::before { background: #fff; }
+        .auth-art-pane h2 { color: #fff; max-width: 650px; font-size: clamp(2.7rem, 5vw, 4.7rem); }
+        .auth-art-pane p, .auth-art-pane .step-label { color: rgba(255,255,255,.76) !important; }
+        .auth-art-pane .step-num { background: #fff; color: #047857; }
+        .auth-art-pane .step-arrow { color: rgba(255,255,255,.55); }
+        .auth-art-pane .glass-panel, .auth-art-pane .glass-chip { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.18); box-shadow: none; color: #fff; }
+        .auth-art-pane .glass-panel::before { display: none; }
+        .auth-art-pane > .glass-panel { display: none; }
+        .auth-art-pane .chip-icon { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.2); color: #fff; }
+        .auth-art-pane .glass-chip p { color: rgba(255,255,255,.75) !important; }
+        .auth-art-visual { display: flex; align-items: center; gap: 2rem; margin: 1.5rem 0; }
+        .auth-visual-orbit { position: relative; display: grid; place-items: center; width: clamp(170px, 22vw, 260px); height: clamp(170px, 22vw, 260px); flex: 0 0 auto; }
+        .auth-visual-orbit::before { content: ''; position: absolute; inset: 8%; border: 1px solid rgba(255,255,255,.25); border-radius: 42% 58% 56% 44%; transform: rotate(25deg); }
+        .auth-visual-orbit::after { content: ''; position: absolute; inset: 0; border: 1px dashed rgba(255,255,255,.2); border-radius: 50%; }
+        .auth-art-visual img { width: 78%; height: 78%; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 24px 24px rgba(4,78,55,.25)); animation: shieldFloat 5s ease-in-out infinite; }
+        .auth-checkmark { position: absolute; z-index: 2; right: 5%; bottom: 10%; display: grid; place-items: center; width: 38px; height: 38px; border: 3px solid #059669; border-radius: 50%; background: #fff; color: #059669; font-size: 1.35rem; font-weight: 800; }
+        .auth-preview-card { width: min(205px, 42vw); padding: 1rem; border: 1px solid rgba(255,255,255,.22); border-radius: 18px; background: rgba(4,78,55,.2); box-shadow: 0 20px 35px rgba(4,78,55,.14); }
+        .auth-preview-card p { margin: 0; color: rgba(255,255,255,.7) !important; font-size: .73rem; }
+        .auth-preview-card strong { display: block; margin: .3rem 0 .6rem; color: #fff; font-size: 2rem; line-height: 1; }
+        .auth-progress { height: 7px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.2); }
+        .auth-progress span { display: block; width: 92%; height: 100%; border-radius: inherit; background: #a7f3d0; }
+        .auth-preview-card > div:last-child { display: flex; justify-content: space-between; gap: .5rem; margin-top: .65rem; color: #a7f3d0; font-size: .65rem; }
+        .auth-preview-card b { color: rgba(255,255,255,.75); font-weight: 500; text-align: right; }
+        @keyframes shieldFloat { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(2deg); } }
+        @media (max-width: 1023px) { .auth-layout { display: flex; flex-direction: column; } .auth-form-pane { min-height: 100svh; padding-top: 6.2rem !important; } .auth-art-pane { min-height: 360px; padding: 3.5rem 1.5rem !important; } .auth-art-pane .grid { display: none; } }
+        @media (max-width: 520px) { .auth-back { width: 54px; height: 54px; top: 0; left: 8px; font-size: 32px; } .auth-form-pane { padding-left: 1.35rem !important; padding-right: 1.35rem !important; } .auth-art-visual { gap: .8rem; } .auth-visual-orbit { width: 135px; height: 135px; } .auth-preview-card { width: 165px; } }
     </style>
 </head>
-<body>
+<body class="auth-page">
     <div class="relative min-h-screen overflow-hidden">
         <div class="auth-mesh"></div>
         <div class="grain"></div>
+        <a href="{{ route('home') }}" class="auth-back" aria-label="Back to home">←</a>
 
-        <div class="relative z-10 mx-auto grid min-h-screen max-w-7xl lg:grid-cols-2">
+        <div class="relative z-10 mx-auto grid min-h-screen max-w-7xl lg:grid-cols-2 auth-layout">
             <!-- Sign-in panel -->
-            <section class="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-12" style="padding-top: max(2.5rem, env(safe-area-inset-top)); padding-bottom: max(2.5rem, env(safe-area-inset-bottom));">
+            <section class="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-12 auth-form-pane" style="padding-top: max(2.5rem, env(safe-area-inset-top)); padding-bottom: max(2.5rem, env(safe-area-inset-bottom));">
                 <div class="w-full max-w-md">
                     <div class="anim-rise mb-8 flex items-center gap-3" style="--d: 0s">
                         <img src="{{ asset('images/logo-3d.svg') }}" alt="Smart Attendance logo" class="h-11 w-11 rounded-xl object-cover">
@@ -275,7 +330,7 @@
             </section>
 
             <!-- Marketing side -->
-            <aside class="hidden lg:flex lg:flex-col lg:justify-between lg:px-14 lg:py-14">
+            <aside class="hidden lg:flex lg:flex-col lg:justify-between lg:px-14 lg:py-14 auth-art-pane">
                 <div class="anim-slide-right max-w-xl" style="--d: 0.12s">
                     <span class="tag-badge">Smart Attendance</span>
                     <h2 class="mt-6 text-5xl font-bold leading-tight tracking-tight">Run the session, not the paperwork.</h2>
@@ -288,6 +343,19 @@
                         <span class="step-num">2</span><span class="step-label">Show QR</span>
                         <span class="step-arrow">→</span>
                         <span class="step-num">3</span><span class="step-label">Track live</span>
+                    </div>
+                </div>
+
+                <div class="auth-art-visual anim-scale" style="--d: 0.18s">
+                    <div class="auth-visual-orbit">
+                        <img src="{{ asset('images/logo-3d-512.png') }}" alt="Smart Attendance shield" loading="eager">
+                        <span class="auth-checkmark">✓</span>
+                    </div>
+                    <div class="auth-preview-card">
+                        <p>Live session status</p>
+                        <strong>Ready</strong>
+                        <div class="auth-progress"><span></span></div>
+                        <div><span>QR check-in</span><b>Protected</b></div>
                     </div>
                 </div>
 

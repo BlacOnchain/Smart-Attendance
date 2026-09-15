@@ -222,6 +222,10 @@ class StudentController extends Controller
             ->get();
 
         $timetableCount = Timetable::whereIn('course_code', $courseCodes)->count();
+        $todayTimetable = Timetable::whereIn('course_code', $courseCodes)
+            ->whereRaw('LOWER(day_of_week) = ?', [strtolower(now()->format('l'))])
+            ->orderBy('start_time')
+            ->get();
 
         $attendedByCourse = Attendance::with('session')
             ->where('user_id', $user->id)
@@ -253,6 +257,7 @@ class StudentController extends Controller
             'attendanceCount',
             'recentAttendances',
             'timetableCount',
+            'todayTimetable',
             'courseAttendanceStats'
         ));
     }

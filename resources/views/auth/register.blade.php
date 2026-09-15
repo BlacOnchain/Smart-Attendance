@@ -229,6 +229,21 @@
             .auth-visual-orbit { width: 135px; height: 135px; }
             .auth-preview-card { width: 165px; }
         }
+
+        /* Final emerald product palette for all auth states. */
+        body.auth-page { background: linear-gradient(160deg, #e9f4ec 0%, #f6f8f2 48%, #eef6f1 100%); }
+        .auth-form-pane { background: #10201a; }
+        .auth-form-pane .btn-nudge { background: #059669; box-shadow: 0 12px 24px rgba(5,150,105,.22); }
+        .auth-form-pane .btn-nudge:hover { background: #047857; }
+        .auth-form-pane .glass-input:focus { border-bottom-color: #34d399; box-shadow: 0 2px 0 #34d399; }
+        .auth-form-pane a { color: #6ee7b7; }
+        .auth-form-pane a:hover { color: #a7f3d0; }
+        .auth-form-pane .lift-hover:hover { border-color: #34d399 !important; }
+        .auth-art-pane { background: linear-gradient(145deg, #047857 0%, #059669 48%, #14b8a6 100%); }
+        .auth-art-pane::before, .auth-art-pane::after { background: rgba(255,255,255,.11); }
+        .auth-art-pane .step-num { color: #047857; }
+        .auth-checkmark { border-color: #059669; }
+        .auth-progress span { background: #a7f3d0; }
     </style>
 </head>
 <body class="auth-page">

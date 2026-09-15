@@ -20,9 +20,9 @@
             --ink: #10201a;
             --paper: #fbfbf7;
             --line: #e4e6df;
-            --brand: #0d9488;
-            --brand-dark: #0f766e;
-            --brand-2: #059669;
+            --brand: #059669;
+            --brand-dark: #047857;
+            --brand-2: #0d9488;
         }
 
         * { font-family: 'IBM Plex Sans', system-ui, sans-serif; }
@@ -114,12 +114,7 @@
         <aside id="sidebar" class="glass-panel fixed inset-y-0 left-0 z-40 w-72 -translate-x-full lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-72 lg:translate-x-0 lg:flex-col" style="border-right: 1px solid var(--line)">
             <div class="flex items-center justify-between gap-3 px-5 py-5" style="border-bottom: 1px solid var(--line)">
                 <div class="flex items-center gap-3">
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-white" style="background: var(--brand)">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2L20 6.5V17.5L12 22L4 17.5V6.5L12 2Z"/>
-                            <path d="M9.5 12.5L11.3 14.3L15 10.2"/>
-                        </svg>
-                    </div>
+                    <img src="{{ asset('images/logo-3d.svg') }}" alt="Smart Attendance logo" class="h-11 w-11 shrink-0 rounded-2xl object-cover">
                     <div>
                         <p class="mono text-[11px] font-semibold" style="color: var(--brand-dark)">Smart Attendance</p>
                         <h1 class="text-lg font-bold" style="color: var(--ink)">Lecturer Portal</h1>
