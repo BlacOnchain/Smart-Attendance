@@ -356,16 +356,22 @@ class StudentController extends Controller
         if ($request->hasFile('photo')) {
             $disk = Storage::disk('public');
             $oldPath = $user->profile_photo_path;
-            $path = $request->file('photo')->store('profile-photos', 'public');
+            $uploadedPhoto = $request->file('photo');
+            $photoContents = file_get_contents($uploadedPhoto->getRealPath());
+            $path = $uploadedPhoto->store('profile-photos', 'public');
 
             // Do not remove the old photo until the replacement is confirmed on disk.
-            if (! $path || ! $disk->exists($path)) {
+            if (! $path || $photoContents === false || ! $disk->exists($path)) {
                 return back()
                     ->withErrors(['photo' => 'The photo could not be saved. Please try again.'])
                     ->withInput();
             }
 
-            $user->update(['profile_photo_path' => $path]);
+            $user->update([
+                'profile_photo_path' => $path,
+                'profile_photo_data' => base64_encode($photoContents),
+                'profile_photo_mime' => $uploadedPhoto->getMimeType() ?: 'image/jpeg',
+            ]);
 
             if ($oldPath && $oldPath !== $path) {
                 $disk->delete($oldPath);

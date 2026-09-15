@@ -25,6 +25,8 @@ class User extends Authenticatable
         'level',
         'semester',
         'profile_photo_path',
+        'profile_photo_data',
+        'profile_photo_mime',
         'otp_code',          // Added for password reset
         'otp_expires_at',    // Added for password reset
     ];
