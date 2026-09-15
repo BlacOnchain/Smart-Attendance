@@ -90,7 +90,7 @@
             <div class="flex items-center gap-4 sm:gap-6">
                 @php
                     $photoUrl = $user->profile_photo_url
-                        ?? ($user->profile_photo_path ? asset('storage/' . $user->profile_photo_path)
+                        ?? ($user->profile_photo_path ? route('profile.photo', ['path' => $user->profile_photo_path])
                         : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=059669&color=fff&size=128');
                 @endphp
                 <img src="{{ $photoUrl }}" alt="Profile photo" class="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl object-cover border-2 border-white/50 shadow-lg">

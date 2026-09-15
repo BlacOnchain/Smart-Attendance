@@ -47,8 +47,8 @@
 
         @php
             $photoUrl = $user->profile_photo_url
-                ?? ($user->profile_photo_path ? asset('storage/' . $user->profile_photo_path)
-                : ($user->profile_photo ? asset('storage/' . $user->profile_photo)
+                ?? ($user->profile_photo_path ? route('profile.photo', ['path' => $user->profile_photo_path])
+                : ($user->profile_photo ? route('profile.photo', ['path' => $user->profile_photo])
                 : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=059669&color=fff&size=128'));
         @endphp
 
