@@ -190,6 +190,12 @@
             0%, 100% { transform: scale(1); opacity: .7; }
             50% { transform: scale(1.35); opacity: 1; }
         }
+        @media (max-width: 640px) {
+            .hero-mesh { height: 520px; }
+            .feature-card { padding: 1.25rem !important; }
+            .nav-glass { padding-left: 1rem; padding-right: 1rem; }
+            .nav-glass .text-\[15px\] { font-size: 14px; }
+        }
     </style>
 </head>
 <body class="min-h-screen antialiased selection:bg-emerald-600 selection:text-white overflow-x-hidden">
@@ -555,7 +561,7 @@
         </div>
     </footer>
 
-    <div id="cookieBanner" class="fixed bottom-4 left-4 right-4 z-50 mx-auto hidden max-w-3xl rounded-2xl border border-emerald-100 bg-white p-4 shadow-2xl sm:flex sm:items-center sm:justify-between sm:gap-5">
+    <div id="cookieBanner" aria-hidden="true" class="fixed bottom-4 left-4 right-4 z-50 mx-auto hidden max-w-3xl rounded-2xl border border-emerald-100 bg-white p-4 shadow-2xl sm:flex sm:items-center sm:justify-between sm:gap-5">
         <p class="text-xs leading-5 text-neutral-600">We use essential cookies to keep the portal secure and remember your preferences.</p>
         <button type="button" onclick="acceptCookies()" class="mt-3 shrink-0 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 sm:mt-0">Accept</button>
     </div>
@@ -598,20 +604,21 @@
 
         document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-        if (!localStorage.getItem('smart_attendance_cookie_consent')) {
-            document.getElementById('cookieBanner').classList.remove('hidden');
+        const cookieBanner = document.getElementById('cookieBanner');
+        const cookieConsentKey = 'smart_attendance_cookie_consent';
+
+        if (cookieBanner && localStorage.getItem(cookieConsentKey) !== 'accepted') {
+            cookieBanner.classList.remove('hidden');
+            cookieBanner.setAttribute('aria-hidden', 'false');
         }
 
-        @media (max-width: 640px) {
-            .hero-mesh { height: 520px; }
-            .feature-card { padding: 1.25rem !important; }
-            .nav-glass { padding-left: 1rem; padding-right: 1rem; }
-            .nav-glass .text-\[15px\] { font-size: 14px; }
-        }
-        function acceptCookies() {
-            localStorage.setItem('smart_attendance_cookie_consent', 'accepted');
-            document.getElementById('cookieBanner').remove();
-        }
+        window.acceptCookies = function () {
+            localStorage.setItem(cookieConsentKey, 'accepted');
+            if (cookieBanner) {
+                cookieBanner.classList.add('hidden');
+                cookieBanner.setAttribute('aria-hidden', 'true');
+            }
+        };
     </script>
 </body>
 </html>

@@ -50,6 +50,33 @@ php artisan db:seed --force
 
 Do not run `migrate:fresh` on Railway because it deletes production data.
 
+## Free deployment alternative: Render + external Postgres
+
+This repository now includes a `Dockerfile` and `render.yaml`. Render can host
+the Laravel web service on its free web plan, but its free web service sleeps
+after inactivity and its free Postgres database expires after 30 days. Do not
+use Render's free Postgres for important attendance records.
+
+For a longer-lived free test setup, create a free Postgres database with
+Supabase, copy its connection URL into Render as `DATABASE_URL`, and deploy
+this repository as a Blueprint. Supabase's free database is 500 MB and pauses
+after one week of inactivity, so this is still a demo/early-pilot setup rather
+than a production backup strategy.
+
+Set these values in Render before the first deploy:
+
+```text
+APP_KEY=<output of php artisan key:generate --show>
+APP_URL=https://your-render-service.onrender.com
+DATABASE_URL=<Supabase pooled PostgreSQL URL>
+MAIL_MAILER=log
+MAIL_FROM_ADDRESS=your-real-school-email@example.com
+```
+
+The container runs `php artisan migrate --force` on startup and never runs
+`migrate:fresh`. Replace `MAIL_MAILER=log` with an HTTPS-based transactional
+mail provider before using password reset or login alerts with real users.
+
 ## Accounts and roles
 
 Public registration creates student accounts only. Lecturer accounts should be created by an administrator or inserted securely with `role=lecturer`. HOD course assignment requires `is_hod=1`.

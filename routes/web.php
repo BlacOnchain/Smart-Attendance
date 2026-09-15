@@ -3,6 +3,7 @@
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseAssignmentController;
+use App\Http\Controllers\HodController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -64,6 +65,12 @@ Route::middleware(['auth', 'role:lecturer'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/course-assignments', [CourseAssignmentController::class, 'index'])->name('admin.course-assignments');
     Route::post('/admin/course-assignments/{course}', [CourseAssignmentController::class, 'update'])->name('admin.course-assignments.update');
+});
+
+Route::middleware(['auth', 'role:lecturer'])->group(function () {
+    Route::get('/hod/dashboard', [HodController::class, 'dashboard'])->name('hod.dashboard');
+    Route::get('/hod/reports', [HodController::class, 'reports'])->name('hod.reports');
+    Route::get('/hod/reports/export', [HodController::class, 'exportReports'])->name('hod.reports.export');
 });
 
 Route::middleware(['auth', 'role:student'])->group(function () {

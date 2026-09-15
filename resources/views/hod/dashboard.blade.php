@@ -43,20 +43,25 @@
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Department Scope</p>
-                <p class="text-xl font-black text-slate-900 mt-2">Computer Science</p>
+                <p class="text-xl font-black text-slate-900 mt-2">{{ $studentCount }} students</p>
             </div>
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Administrative Role</p>
-                <p class="text-xl font-black text-emerald-700 mt-2">HOD Supreme</p>
+                <p class="text-xl font-black text-emerald-700 mt-2">{{ $lecturerCount }} lecturers</p>
             </div>
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Course Allocations</p>
-                <a href="{{ route('admin.course-assignments') }}" class="inline-block text-sm font-bold text-emerald-600 hover:underline mt-2">Manage Assignments &rarr;</a>
+                <p class="text-xl font-black text-slate-900 mt-2">{{ $courseCount }} courses</p>
             </div>
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <p class="text-xs font-bold uppercase tracking-wider text-slate-400">System Status</p>
-                <p class="text-xl font-black text-emerald-600 mt-2">Fully Operational</p>
+                <p class="text-xl font-black text-emerald-600 mt-2">{{ $todayAttendance }} check-ins today</p>
             </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ route('admin.course-assignments') }}" class="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white">Manage course assignments</a>
+            <a href="{{ route('hod.reports') }}" class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700">Open attendance reports</a>
         </div>
 
     </main>

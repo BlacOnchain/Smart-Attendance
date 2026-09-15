@@ -58,7 +58,7 @@ class AuthController extends Controller
         $this->recordLogin($request, $user);
 
         return redirect()->intended($user->role === 'lecturer'
-            ? route('lecturer.dashboard')
+            ? ($user->is_hod ? route('hod.dashboard') : route('lecturer.dashboard'))
             : route('student.dashboard'));
     }
 
@@ -83,7 +83,9 @@ class AuthController extends Controller
         $request->session()->regenerate();
         $this->recordLogin($request, Auth::user());
 
-        return redirect()->intended(route('lecturer.dashboard'));
+        return redirect()->intended(Auth::user()->is_hod
+            ? route('hod.dashboard')
+            : route('lecturer.dashboard'));
     }
 
     private function recordLogin(Request $request, User $user): void

@@ -13,6 +13,16 @@ class Timetable extends Model
         'course_code',
         'day_of_week',
         'start_time',
-        'end_time'
+        'end_time',
+        'level',
+        'semester',
+        'academic_session',
+        'venue',
+        'lecturer_id',
     ];
+
+    public function lecturer()
+    {
+        return $this->belongsTo(User::class, 'lecturer_id');
+    }
 }
